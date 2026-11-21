@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Αποστολή Β1.1: Ο Ψηφιακός Σκηνοθέτης</title>
+  <meta name="description" content="Διαδραστικό παιχνίδι εκμάθησης του επιμορφωτικού υλικού Β1.1 Φιλολογικά (12 Συνεδρίες, 2026)." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+
+    :root {
+      --background: #f8fafc;
+      --content: #ffffff;
+      --card: #ffffff;
+      --sidebar: #f1f5f9;
+      --card-border: #e2e8f0;
+      --border: #e2e8f0;
+      --foreground: #0f172a;
+      --muted-foreground: #475569;
+      --primary: #4f46e5;
+      --primary-foreground: #ffffff;
+      --secondary: #f1f5f9;
+      --secondary-foreground: #0f172a;
+      --accent: #eef2ff;
+      --link: #4f46e5;
+      --success: #16a34a;
+      --warning: #d97706;
+      --error: #dc2626;
+      --chart-1: #4f46e5;
+      --chart-2: #0891b2;
+      --chart-3: #d97706;
+      --chart-4: #16a34a;
+    }
+    [data-theme="dark"] {
+      --background: #0b1120;
+      --content: #0f172a;
+      --card: #111c33;
+      --sidebar: #0f172a;
+      --card-border: #233252;
+      --border: #233252;
+      --foreground: #f1f5f9;
+      --muted-foreground: #94a3b8;
+      --primary: #818cf8;
+      --primary-foreground: #0b1120;
+      --secondary: #1e293b;
+      --secondary-foreground: #f1f5f9;
+      --accent: #1e293b;
+      --link: #818cf8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #f87171;
+      --chart-1: #818cf8;
+      --chart-2: #22d3ee;
+      --chart-3: #fbbf24;
+      --chart-4: #4ade80;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* Smooth animations */
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(8px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    @keyframes pulseSuccess {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .animate-pop { animation: popIn 0.24s ease-out both; }
+    .animate-shake { animation: shake 0.35s ease-in-out; }
+    .animate-pulse-ok { animation: pulseSuccess 0.32s ease-out; }
+
+    /* Flashcard flip */
+    .flip-perspective { perspective: 1000px; }
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      min-height: 220px;
+      transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-inner.is-flipped { transform: rotateY(180deg); }
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .flip-back { transform: rotateY(180deg); }
+
+    /* Custom subtle scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+      border-radius: 999px;
+    }
+
+    /* Accent semantic helpers using color-mix for theme adaptability */
+    .soft-primary {
+      background-color: color-mix(in srgb, var(--primary) 13%, transparent);
+      border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+      color: var(--foreground);
+    }
+    .soft-success {
+      background-color: color-mix(in srgb, var(--success) 14%, transparent);
+      border-color: color-mix(in srgb, var(--success) 45%, transparent);
+      color: var(--foreground);
+    }
+    .soft-warning {
+      background-color: color-mix(in srgb, var(--warning) 15%, transparent);
+      border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+      color: var(--foreground);
+    }
+    .soft-error {
+      background-color: color-mix(in srgb, var(--error) 14%, transparent);
+      border-color: color-mix(in srgb, var(--error) 45%, transparent);
+      color: var(--foreground);
+    }
+
+    .tab-btn[aria-selected="true"] {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      border-color: var(--primary);
+    }
+    .tab-btn[aria-selected="false"] {
+      background-color: var(--card);
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    .tab-btn[aria-selected="false"]:hover {
+      background-color: var(--accent);
+    }
+
+    .option-card {
+      transition: transform 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
+    }
+    .option-card:not(:disabled):hover {
+      transform: translateY(-1px);
+      border-color: var(--primary);
+      background-color: color-mix(in srgb, var(--primary) 7%, var(--card));
+    }
+    .option-card:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased">
+
+  <!-- Toast notification container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+  <!-- Confirmation Modal for Reset -->
+  <div id="reset-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: color-mix(in srgb, var(--background) 75%, black 25%); backdrop-filter: blur(4px);">
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-md w-full p-6 shadow-xl animate-pop">
+      <h3 class="text-lg font-bold mb-2">Επαναφορά Προόδου;</h3>
+      <p class="text-sm text-[var(--muted-foreground)] mb-5">
+        Θα μηδενιστούν οι πόντοι XP, οι ολοκληρωμένες συνεδρίες, τα τρόπαια και η λίστα επανάληψης λαθών. Η ενέργεια δεν αναιρείται.
+      </p>
+      <div class="flex justify-end gap-2">
+        <button id="cancel-reset-btn" class="px-4 py-2 rounded-xl text-sm font-medium border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-90 cursor-pointer">
+          Άκυρο
+        </button>
+        <button id="confirm-reset-btn" class="px-4 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer" style="background-color: var(--error);">
+          Επαναφορά
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-5 md:py-7">
+    <!-- Top HUD Header -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 md:p-5 mb-5 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 border" style="background: color-mix(in srgb, var(--primary) 16%, transparent); border-color: color-mix(in srgb, var(--primary) 35%, transparent);">
+            🎬
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Αποστολή Β1.1: Ο Ψηφιακός Σκηνοθέτης</h1>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full border soft-primary">12 Συνεδρίες · 6η Έκδοση 2026</span>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mt-0.5">
+              Διαδραστικό παιχνίδι εκμάθησης του επιμορφωτικού υλικού Β1.1 (Φιλολογικά) — ΙΤΥΕ «Διόφαντος» &amp; ΙΕΠ
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="mistakes-shortcut-btn" class="px-3 py-2 rounded-xl text-xs font-semibold border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-90 flex items-center gap-1.5 cursor-pointer" title="Εξάσκηση μόνο στα λάθη σου">
+            <span>🔁 Επανάληψη Λαθών</span>
+            <span id="hud-mistakes-badge" class="px-1.5 py-0.5 rounded-full text-xs font-bold" style="background: var(--primary); color: var(--primary-foreground);">0</span>
+          </button>
+          <button id="theme-toggle-btn" class="px-3 py-2 rounded-xl text-xs font-semibold border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-90 cursor-pointer" title="Εναλλαγή φωτεινού/σκοτεινού θέματος">🌙 Θέμα</button>
+          <button id="sound-toggle-btn" class="px-3 py-2 rounded-xl text-xs font-semibold border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-90 cursor-pointer" title="Ενεργοποίηση/Σίγαση ήχων">
+            🔊 Ήχος: Ναι
+          </button>
+          <button id="open-reset-btn" class="px-3 py-2 rounded-xl text-xs font-semibold border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer" title="Επαναφορά προόδου">
+            ↺ Μηδενισμός
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats & XP Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[var(--border)]">
+        <div class="rounded-xl p-3 bg-[var(--background)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)] font-medium">Βαθμίδα &amp; XP</div>
+          <div class="flex items-baseline justify-between gap-2 mt-0.5">
+            <span id="hud-rank" class="text-sm font-bold truncate">Αναγνώστης ΨΤ</span>
+            <span id="hud-xp" class="text-sm font-extrabold" style="color: var(--primary);">0 XP</span>
+          </div>
+          <div class="w-full h-2 rounded-full mt-2 overflow-hidden bg-[var(--secondary)]">
+            <div id="hud-xp-bar" class="h-full rounded-full transition-all duration-500" style="width: 0%; background-color: var(--primary);"></div>
+          </div>
+        </div>
+
+        <div class="rounded-xl p-3 bg-[var(--background)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)] font-medium">Σφραγίδες Συνεδριών</div>
+          <div class="flex items-baseline justify-between mt-0.5">
+            <span id="hud-sessions" class="text-lg font-extrabold">0 / 12</span>
+            <span id="hud-sessions-pct" class="text-xs font-semibold text-[var(--muted-foreground)]">0%</span>
+          </div>
+          <div class="w-full h-2 rounded-full mt-2 overflow-hidden bg-[var(--secondary)]">
+            <div id="hud-sessions-bar" class="h-full rounded-full transition-all duration-500" style="width: 0%; background-color: var(--success);"></div>
+          </div>
+        </div>
+
+        <div class="rounded-xl p-3 bg-[var(--background)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)] font-medium">Τρέχον &amp; Καλύτερο Σερί</div>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span id="hud-streak" class="text-lg font-extrabold">🔥 0</span>
+            <span class="text-xs text-[var(--muted-foreground)]">Ρεκόρ: <strong id="hud-best-streak" class="text-[var(--foreground)]">0</strong></span>
+          </div>
+        </div>
+
+        <div class="rounded-xl p-3 bg-[var(--background)] border border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)] font-medium">Τρόπαια</div>
+          <div class="flex items-baseline justify-between mt-1">
+            <span id="hud-badges" class="text-lg font-extrabold">🏆 0 / 10</span>
+            <button id="goto-badges-btn" class="text-xs font-semibold underline cursor-pointer" style="color: var(--link);">Προβολή</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Primary Navigation Tabs -->
+    <nav class="flex flex-wrap gap-2 mb-5" role="tablist" aria-label="Λειτουργίες Παιχνιδιού">
+      <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border transition cursor-pointer flex items-center gap-2" role="tab" data-tab="map" aria-selected="true">
+        <span>🗺️</span> <span>Χάρτης 12 Συνεδριών</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border transition cursor-pointer flex items-center gap-2" role="tab" data-tab="scenarios" aria-selected="false">
+        <span>🎭</span> <span>Σκηνοθέτης της Τάξης</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border transition cursor-pointer flex items-center gap-2" role="tab" data-tab="matching" aria-selected="false">
+        <span>🧩</span> <span>Ταίριαξε Όρους &amp; Εργαλεία</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border transition cursor-pointer flex items-center gap-2" role="tab" data-tab="blitz" aria-selected="false">
+        <span>⚡</span> <span>Αστραπή: Μύθος ή Αλήθεια;</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border transition cursor-pointer flex items-center gap-2" role="tab" data-tab="study" aria-selected="false">
+        <span>📖</span> <span>Κάρτες Μελέτης &amp; Τρόπαια</span>
+      </button>
+    </nav>
+
+    <!-- Main Dynamic View Container -->
+    <main id="app-view" class="min-h-[520px]"></main>
+
+    <!-- Footer -->
+    <footer class="mt-8 pt-4 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--muted-foreground)]">
+      <span>Βασισμένο στο Ενιαίο Επιμορφωτικό Υλικό Β1.1 (Φιλολογικά) · 6η Έκδοση, Φεβρουάριος 2026</span>
+      <span>Η πρόοδος αποθηκεύεται τοπικά στον φυλλομετρητή σου (localStorage)</span>
+    </footer>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  // =========================================================================
+  // 1. CURRICULUM DATA — ALL 12 SESSIONS OF B1.1 (ΦΙΛΟΛΟΓΙΚΑ, 6Η ΕΚΔ. 2026)
+  // =========================================================================
+
+  const WINGS = [
+    { id: 'A', title: 'Πτέρυγα Α: Θεμέλια, Εργαλεία & Θεωρίες', subtitle: 'Συνεδρίες 1–3', colorVar: '--chart-1', sessions: [1, 2, 3] },
+    { id: 'B', title: 'Πτέρυγα Β: Σχεδιασμός, Παρουσίαση & Πλατφόρμες', subtitle: 'Συνεδρίες 4–6', colorVar: '--chart-2', sessions: [4, 5, 6] },
+    { id: 'C', title: 'Πτέρυγα Γ: Συνεργασία, Αποθετήρια & Αναδυόμενες ΨΤ', subtitle: 'Συνεδρίες 7–9', colorVar: '--chart-3', sessions: [7, 8, 9] },
+    { id: 'D', title: 'Πτέρυγα Δ: Κοινότητες, Πολιτειότητα & Αναστοχασμός', subtitle: 'Συνεδρίες 10–12', colorVar: '--chart-4', sessions: [10, 11, 12] }
+  ];
+
+  const SESSIONS = [
+    { id: 1, short: 'Εισαγωγή στις ΨΤ', title: 'Εισαγωγή στην εκπαιδευτική αξιοποίηση των Ψηφιακών Τεχνολογιών', icon: '🧭', wing: 'A', keywords: 'DigComp 3.0, DigCompEdu, Boolean, Κριτικός Γραμματισμός' },
+    { id: 2, short: 'Κατηγοριοποίηση Εργαλείων', title: 'Κατηγοριοποίηση εργαλείων – περιβαλλόντων', icon: '🧰', wing: 'A', keywords: 'Γνωστικά εργαλεία, Corpora, Ανεμόσκαλα, Αναπλαισίωση' },
+    { id: 3, short: 'Θεωρίες Μάθησης & Προσεγγίσεις', title: 'Θεωρίες μάθησης και Διδακτικές Προσεγγίσεις με ΨΤ', icon: '🧠', wing: 'A', keywords: 'Piaget, Vygotsky (ΖΕΑ), Papert, IBL, PBL, STEAM' },
+    { id: 4, short: 'Διδακτικός Σχεδιασμός', title: 'Θεωρίες μάθησης, διδακτικές προσεγγίσεις και διδακτικός σχεδιασμός', icon: '📐', wing: 'B', keywords: 'Εκπαιδευτικό Σενάριο, Διαφοροποίηση, FLIP' },
+    { id: 5, short: 'Παρουσιάσεις & ΔΠ', title: 'Λογισμικά παρουσίασης, Διαδραστικοί Πίνακες & διαδραστικά βιβλία', icon: '🖥️', wing: 'B', keywords: 'Αρχές Mayer, Ονοματοποίηση, Prensky, ebooks.edu.gr' },
+    { id: 6, short: 'Ασύγχρονες Πλατφόρμες', title: 'Εργαλεία και πλατφόρμες υποστήριξης ασύγχρονων δραστηριοτήτων', icon: '🏛️', wing: 'B', keywords: 'Open eClass (Lego Bricks), e-me (PLE, Κυψέλη), H5P' },
+    { id: 7, short: 'Συνεργατικά Εργαλεία', title: 'Συνεργατικά και άλλα εργαλεία γενικής χρήσης', icon: '☁️', wing: 'C', keywords: 'Cloud (IaaS/PaaS/SaaS), +γραφίς, Wikis, Εννοιολογικοί Χάρτες' },
+    { id: 8, short: 'Αποθετήρια & ΑΕΠ', title: 'Αξιοποίηση αποθετηρίων και Ανοιχτών Εκπαιδευτικών Πόρων', icon: '📚', wing: 'C', keywords: '5R ΑΕΠ, Creative Commons, Φωτόδεντρο, Πρωτέας, Αίσωπος' },
+    { id: 9, short: 'Αναδυόμενες Τεχνολογίες', title: 'Αναδυόμενες Τεχνολογίες (VR, AR, Ρομποτική, ΤΝ, IoT)', icon: '🚀', wing: 'C', keywords: 'Artsteps, ARTutor, Prompts 9 βημάτων, Llama-Krikri, Φάρος' },
+    { id: 10, short: 'Κοινωνικά Δίκτυα & Κοινότητες', title: 'Κοινωνικά δίκτυα και Εκπαίδευση. Εκπαιδευτικές Κοινότητες', icon: '🌐', wing: 'D', keywords: 'Wenger, Filter Bubbles, Διάλογος (3Ε), e-me κοινότητα' },
+    { id: 11, short: 'Ψηφιακή Πολιτειότητα', title: 'Ψηφιακή Πολιτειότητα – Ασφαλής χρήση διαδικτύου & ΤΝ', icon: '🛡️', wing: 'D', keywords: 'Post-truth, Hallucinations, AI Act, Cognitive Outsourcing' },
+    { id: 12, short: 'Αναστοχασμός & Σχεδιασμός', title: 'Διδακτικός σχεδιασμός και αναστοχασμός', icon: '🪞', wing: 'D', keywords: 'Στοχαστικό-κριτικό μοντέλο, Σχολικός χρόνος, Ρόλοι' }
+  ];
+
+  // 24 Rich Classroom Scenarios & Conceptual Questions (2 per session across all 12 sessions)
+  const SCENARIOS = [
+    // Session 1
+    {
+      id: 'sc-1a', session: 1, tag: 'Πλαίσια Ικανοτήτων',
+      prompt: 'Κατά τον σχεδιασμό επιμόρφωσης φιλολόγων με βάση το ευρωπαϊκό πλαίσιο DigCompEdu, ποιοι τομείς συνθέτουν τον παιδαγωγικό πυρήνα του πλαισίου;',
+      options: [
+        'Οι τομείς 2 έως 5: Ψηφιακοί πόροι, Διδασκαλία & μάθηση, Αξιολόγηση και Ενδυνάμωση εκπαιδευομένων.',
+        'Μόνο ο τομέας 1 (Επαγγελματική ενασχόληση) και ο τομέας 6 (Καλλιέργεια ψηφιακής ικανότητας μαθητών).',
+        'Οι 5 περιοχές του DigComp 3.0 που αφορούν αποκλειστικά τις τεχνικές δεξιότητες προγραμματισμού.',
+        'Αποκλειστικά η διαχείριση υποδομών, δικτύων και λογισμικού γραφείου στο σχολικό εργαστήριο.'
+      ],
+      correct: 0,
+      explanation: 'Το DigCompEdu περιλαμβάνει 6 τομείς· ο παιδαγωγικός του πυρήνας εστιάζει στους τομείς 2–5 (Ψηφιακοί πόροι, Διδασκαλία & μάθηση, Αξιολόγηση, Ενδυνάμωση εκπαιδευομένων), πλαισιωμένους από την επαγγελματική ενασχόληση (1) και την καλλιέργεια της ψηφιακής ικανότητας των μαθητών (6).'
+    },
+    {
+      id: 'sc-1b', session: 1, tag: 'Υβριδική Αναζήτηση',
+      prompt: 'Μαθητές Λυκείου αρκούνται στην έτοιμη σύνοψη Google AI Overview χωρίς να ανοίξουν καμία πηγή. Τι επισημαίνει η 1η Συνεδρία για τη μετάβαση αυτή;',
+      options: [
+        'Η μετάβαση από την «αναζήτηση πληροφοριών» στην «αναζήτηση απαντήσεων» ενέχει κίνδυνο γνωστικής παθητικότητας και αποδοχής ψευδαισθήσεων (hallucinations).',
+        'Οι έτοιμες συνόψεις ΤΝ αντικαθιστούν πλήρως την ανάγκη κριτικού γραμματισμού και ελέγχου πηγών.',
+        'Η χρήση λογικών τελεστών Boolean (ΚΑΙ, Ή, ΟΧΙ) καταργείται σε κάθε περιβάλλον έρευνας.',
+        'Αποτελεί την πιο προηγμένη μορφή του ολιστικού μοντέλου εισαγωγής ΨΤ χωρίς καμία επιφύλαξη.'
+      ],
+      correct: 0,
+      explanation: 'Η 1η Συνεδρία προειδοποιεί ότι η «αναζήτηση απαντήσεων» (AI Overview) μπορεί να οδηγήσει σε γνωστική παθητικότητα και αβασάνιστη αποδοχή hallucinations. Αντίθετα, απαιτείται κριτικός ψηφιακός γραμματισμός και διασταύρωση πηγών (π.χ. και με «καθαρές» μηχανές όπως DuckDuckGo).'
+    },
+    // Session 2
+    {
+      id: 'sc-2a', session: 2, tag: 'Διδακτική Αναπλαισίωση',
+      prompt: 'Ένας φιλόλογος χρησιμοποιεί ένα απλό εργαλείο κουίζ (π.χ. Wordwall/Kahoot), αλλά αντί να βάλει τους μαθητές απλώς να απαντούν, τους ζητά να συντάξουν οι ίδιοι τις ερωτήσεις, τους παραπλανητές και την ανατροφοδότηση. Ποια έννοια της 2ης Συνεδρίας εφαρμόζει;',
+      options: [
+        'Διδακτική αναπλαισίωση (Bernstein / Fairclough): το ίδιο εργαλείο μετατοπίζεται από την Κατηγορία Α (drill & practice) σε εργαλείο έκφρασης και μεταγνώσης.',
+        'Αυστηρή συμπεριφοριστική εξάσκηση (CAI/CALL) με αυτοματοποιημένη βαθμολόγηση.',
+        'Τεχνοκρατικό ντετερμινισμό, καθώς η φύση του λογισμικού καθορίζει μονοσήμαντα τη μάθηση.',
+        'Περιορισμό του εργαλείου στην Κατηγορία Α4 ως απλή πηγή πληροφόρησης.'
+      ],
+      correct: 0,
+      explanation: 'Μέσω της διδακτικής αναπλαισίωσης (Bernstein 1996, Fairclough 2003), ένα λογισμικό δεν «κλειδώνει» σε μία κατηγορία· ο παιδαγωγικός σχεδιασμός του εκπαιδευτικού μπορεί να μετατρέψει ένα εργαλείο εξάσκησης σε γνωστικό εργαλείο παραγωγής λόγου.'
+    },
+    {
+      id: 'sc-2b', session: 2, tag: 'Σώματα Κειμένων (Corpora)',
+      prompt: 'Θέλεις οι μαθητές να ερευνήσουν μοτίβα λέξεων σε νεοελληνικά ποιήματα χρησιμοποιώντας συμφραστικούς πίνακες και χαρακτήρες αποκοπής (* ή %). Ποιο περιβάλλον του ΚΕΓ είναι το καταλληλότερο;',
+      options: [
+        'Η «Ανεμόσκαλα» (σώμα κειμένων νεοελληνικής ποίησης).',
+        'Η «Μνημοσύνη» (αποκλειστικά αρχαιοελληνικά κείμενα και μεταφράσεις).',
+        'Η Επιτομή του Λεξικού Κριαρά (Μεσαιωνική Δημώδης Γραμματεία 1100–1669).',
+        'Η πλατφόρμα Φιλογλωσσία (καθοδηγούμενη εκμάθηση Ελληνικής ως ξένης γλώσσας).'
+      ],
+      correct: 0,
+      explanation: 'Η «Ανεμόσκαλα» είναι το ηλεκτρονικό περιβάλλον συμφραστικών πινάκων για τη νεοελληνική ποίηση (υποστηρίζει χαρακτήρες αποκοπής * και %), ενώ η «Μνημοσύνη» αφορά αρχαιοελληνικά κείμενα με παράλληλες μεταφράσεις.'
+    },
+    // Session 3
+    {
+      id: 'sc-3a', session: 3, tag: 'Θεωρίες Μάθησης',
+      prompt: 'Σε μια δραστηριότητα συγγραφής επιχειρηματολογικού κειμένου, ο εκπαιδευτικός παρέχει αρχικά ένα δομημένο ψηφιακό πρότυπο (οδηγό ερωτήσεων) και σταδιακά το αποσύρει καθώς οι μαθητές αυτονομούνται. Σε ποιον θεωρητικό και ποια έννοια παραπέμπει αυτή η πρακτική;',
+      options: [
+        'Στον L. S. Vygotsky — Γνωστική Σκαλωσιά (scaffolding) εντός της Ζώνης Επικείμενης Ανάπτυξης (ΖΕΑ).',
+        'Στον συμπεριφορισμό — μοντέλο «μαύρου κουτιού» και μηχανικής ενίσχυσης.',
+        'Στον J. Piaget — αποκλειστικά ατομική βιολογική ωρίμανση χωρίς κοινωνική διαμεσολάβηση.',
+        'Στον G. Polya — τέταρτο στάδιο ανασκόπησης σε μαθηματικό αλγόριθμο.'
+      ],
+      correct: 0,
+      explanation: 'Η προσωρινή υποστήριξη που αποσύρεται σταδιακά καθώς ο μαθητής κατακτά νέες ικανότητες με τη βοήθεια πιο έμπειρου άλλου ή εργαλείου είναι η Γνωστική Σκαλωσιά (scaffolding) στη Ζώνη Επικείμενης Ανάπτυξης (ΖΕΑ/ZPD) του Vygotsky.'
+    },
+    {
+      id: 'sc-3b', session: 3, tag: 'Διερευνητική vs Επίλυση Προβλήματος',
+      prompt: 'Κατά τον Savery (2006), ποια είναι η βασική διαφορά στον ρόλο του εκπαιδευτικού ανάμεσα στη Διερευνητική Μάθηση (IBL) και τη Μάθηση μέσω Επίλυσης Προβλήματος (Problem-Based Learning);',
+      options: [
+        'Στη διερευνητική μάθηση ο εκπαιδευτικός μπορεί να λειτουργεί και ως πάροχος πληροφορίας, ενώ στην επίλυση προβλήματος λειτουργεί αυστηρά ως διευκολυντής (facilitator).',
+        'Στην επίλυση προβλήματος ο εκπαιδευτικός παραδίδει αναλυτική διάλεξη πριν δοθεί το πρόβλημα.',
+        'Η επίλυση προβλήματος χρησιμοποιεί μόνο καλά δομημένα προβλήματα με μία μοναδική λύση.',
+        'Δεν υπάρχει καμία διαφορά· οι δύο όροι είναι απολύτως ταυτόσημοι στη βιβλιογραφία.'
+      ],
+      correct: 0,
+      explanation: 'Στην Επίλυση Προβλήματος (με ασθενώς δομημένα / ill-structured προβλήματα) ο εκπαιδευτικός παραμένει διευκολυντής της διαδικασίας, ενώ στη Διερευνητική Μάθηση (IBL) συνδυάζει τον ρόλο του καθοδηγητή και του παρόχου πληροφορίας (Savery, 2006).'
+    },
+    // Session 4
+    {
+      id: 'sc-4a', session: 4, tag: 'Διαφοροποιημένη Διδασκαλία',
+      prompt: 'Συνάδελφος σχεδιάζει τρία φύλλα εργασίας για το ίδιο μάθημα: «εύκολο» για τους αδύναμους, «μέτριο» και «δύσκολο» για τους άριστους. Τι επισημαίνει η 4η Συνεδρία (Ιωαννίδου-Κουτσελίνη, 2020) για αυτή την προσέγγιση;',
+      options: [
+        'Η διαφοροποίηση ΔΕΝ ταυτίζεται με την απλή διαβάθμιση δυσκολίας, γιατί ελλοχεύει ο κίνδυνος στιγματισμού και αναπαραγωγής άνισων μαθησιακών ευκαιριών.',
+        'Είναι ο μοναδικός ορθός τρόπος διαφοροποίησης, εφόσον οι ομάδες παραμένουν μόνιμα ομοιογενείς.',
+        'Αποτελεί την κλασική εφαρμογή των 4 πυλώνων FLIP της Ανεστραμμένης Τάξης.',
+        'Η διαφοροποίηση αφορά αποκλειστικά τη μορφή του τελικού διαγωνίσματος και όχι το περιεχόμενο ή τη διαδικασία.'
+      ],
+      correct: 0,
+      explanation: 'Η 4η Συνεδρία τονίζει ότι η διαφοροποίηση αφορά περιεχόμενο (ενδιαφέροντα, πολυτροπικότητα), διαδικασία (ετερογενείς ομάδες, αλληλεπίδραση) και προϊόν — δεν πρέπει να εκφυλίζεται σε «διαβάθμιση δυσκολίας» που παγιώνει ανισότητες.'
+    },
+    {
+      id: 'sc-4b', session: 4, tag: 'Ανεστραμμένη Τάξη (FLIP)',
+      prompt: 'Ένας εκπαιδευτικός ανεβάζει μια 30λεπτη βιντεοδιάλεξη στο σπίτι και στην τάξη λύνει ασκήσεις στον πίνακα μπροστά σε σιωπηλούς μαθητές. Γιατί αυτή η πρακτική αποτυγχάνει να υλοποιήσει ουσιαστική Ανεστραμμένη Τάξη;',
+      options: [
+        'Γιατί αναπαράγει το συμπεριφοριστικό/μετωπικό μοντέλο· η ουσιαστική Ανεστραμμένη Τάξη απαιτεί αναστροφή ρόλων, ασύγχρονη διερεύνηση και ενεργητική σύνθεση/συζήτηση στην τάξη (πυλώνες FLIP).',
+        'Γιατί στην Ανεστραμμένη Τάξη απαγορεύεται η χρήση οποιουδήποτε βίντεο στο στάδιο pre-class.',
+        'Γιατί η Ανεστραμμένη Τάξη εφαρμόζεται μόνο σε πανεπιστημιακά μαθήματα και όχι στη Δευτεροβάθμια.',
+        'Γιατί το στάδιο post-class πρέπει να προηγείται χρονικά του σταδίου in-class.'
+      ],
+      correct: 0,
+      explanation: 'Η Ανεστραμμένη Τάξη στηρίζεται στους 4 πυλώνες FLIP (Flexible Environment, Learning Culture, Intentional Content, Professional Educator) και στα 3 στάδια (pre/in/post-class), μετατοπίζοντας το κέντρο βάρους από τη διάλεξη στην ενεργητική εμπλοκή των μαθητών.'
+    },
+    // Session 5
+    {
+      id: 'sc-5a', session: 5, tag: 'Αρχές Πολυμέσων (Mayer)',
+      prompt: 'Ένας μαθητής ετοιμάζει διαφάνειες PowerPoint αντιγράφοντας ολόκληρες παραγράφους από τη Wikipedia και διαβάζοντάς τες κατά λέξη στην τάξη, ενώ βάζει άσχετα κινούμενα GIF. Ποιες αρχές της 5ης Συνεδρίας παραβιάζει;',
+      options: [
+        'Την αρχή της λιτότητας (ελλειπτικός λόγος/ονοματοποίηση) και τις πολυμεσικές αρχές Mayer (αποφυγή άσχετων στοιχείων, περιορισμός πλεονασμού).',
+        'Μόνο την αρχή της μη γραμμικής πλοήγησης που ισχύει αποκλειστικά στο Prezi.',
+        'Καμία, εφόσον οι διαφάνειες περιέχουν ακριβείς εγκυκλοπαιδικές πληροφορίες.',
+        'Τον κανόνα ότι οι διαφάνειες πρέπει να αντικαθιστούν πλήρως τον προφορικό λόγο του ομιλητή.'
+      ],
+      correct: 0,
+      explanation: 'Οι παρουσιάσεις λειτουργούν υποστηρικτικά στον προφορικό λόγο με ελλειπτικό λόγο/ονοματοποίηση και ακολουθούν τις αρχές Mayer (2020): αποφυγή άσχετων στοιχείων, οπτική επισήμανση, περιορισμός πλεονασμού και τμηματοποίηση.'
+    },
+    {
+      id: 'sc-5b', session: 5, tag: 'Διαδραστικός Πίνακας',
+      prompt: 'Σε ένα τμήμα με Διαδραστικό Πίνακα (ΔΠ), μόνο ο εκπαιδευτικός αγγίζει τον πίνακα για να προβάλλει διαφάνειες, ενώ οι μαθητές αντιγράφουν στα τετράδιά τους. Τι υπογραμμίζει ο Prensky στην 5η Συνεδρία;',
+      options: [
+        'Ότι οι μαθητές ΠΡΕΠΕΙ να χρησιμοποιούν ενεργά τους ΔΠ (όχι μόνο οι εκπαιδευτικοί), αλλιώς ο πίνακας αναπαράγει τη δασκαλοκεντρική διδασκαλία.',
+        'Ότι οι μαθητές δεν πρέπει να πλησιάζουν τον ΔΠ για λόγους προστασίας του εξοπλισμού.',
+        'Ότι ο ΔΠ έχει παιδαγωγική αξία μόνο όταν χρησιμοποιείται ως απλός προβολέας (projector).',
+        'Ότι η λειτουργία layering και curtain/revealer απευθύνεται αποκλειστικά σε μαθήματα Μαθηματικών.'
+      ],
+      correct: 0,
+      explanation: 'Ο Prensky και η έρευνα (Hennessy & London, 2013) τονίζουν ότι η μετασχηματιστική δύναμη του ΔΠ ενεργοποιείται όταν οι ίδιοι οι μαθητές αλληλεπιδρούν με το υλικό (drag & drop, επισημάνσεις, layering, συνεργατικοί πίνακες).'
+    },
+    // Session 6
+    {
+      id: 'sc-6a', session: 6, tag: 'Φιλοσοφία e-me vs e-class',
+      prompt: 'Ποια είναι η ουσιαστική αρχιτεκτονική και παιδαγωγική διαφορά ανάμεσα στο Open eClass και την πλατφόρμα e-me;',
+      options: [
+        'Το e-class είναι ΣΔΜ (LMS) με κέντρο το αρθρωτό Ηλεκτρονικό Μάθημα (Lego Bricks), ενώ η e-me ακολουθεί φιλοσοφία Προσωπικού Περιβάλλοντος Μάθησης (PLE) με ισότιμη σχέση εκπαιδευτικού–μαθητή (μοναδική εξαίρεση το e-me assignments).',
+        'Το e-class είναι εμπορικό λογισμικό κλειστού κώδικα, ενώ η e-me δεν υποστηρίζει H5P.',
+        'Στην e-me μόνο ο εκπαιδευτικός μπορεί να δημιουργήσει Κυψέλες και περιεχόμενο, ενώ στο e-class όλοι έχουν δικαιώματα διαχειριστή.',
+        'Και οι δύο πλατφόρμες σχεδιάστηκαν αποκλειστικά ως αποθετήρια αρχείων PDF.'
+      ],
+      correct: 0,
+      explanation: 'Η e-me (PLE) προωθεί την ισότιμη συμμετοχή — ό,τι μπορεί να κάνει ο εκπαιδευτικός μπορεί και ο μαθητής, με μόνη διαφοροποίηση ρόλων στην εφαρμογή e-me assignments (και στην ανάρτηση στη βιβλιοθήκη κυψέλης). Το e-class είναι ανοιχτού κώδικα LMS δομημένο σε αρθρωτά εργαλεία (Lego Bricks).'
+    },
+    {
+      id: 'sc-6b', session: 6, tag: 'Οργάνωση Ηλεκτρονικού Μαθήματος',
+      prompt: 'Στην 6η Συνεδρία συγκρίνονται δύο παραδείγματα μαθημάτων στο e-class. Τι ξεχωρίζει το επιτυχημένο Παράδειγμα 2 από το απλό αποθετήριο (Παράδειγμα 1);',
+      options: [
+        'Η οργάνωση σε Θεματικές Ενότητες, η χρήση «Προσθήκης Κειμένου» με σαφείς οδηγίες/σκαλωσιά και η αξιοποίηση forum για ετεροαξιολόγηση και αλληλεπίδραση.',
+        'Το ανέβασμα όσο το δυνατόν περισσότερων αταξινόμητων αρχείων Word στον φάκελο «Έγγραφα».',
+        'Η απενεργοποίηση όλων των εργαλείων επικοινωνίας ώστε να μην αποσπώνται οι μαθητές.',
+        'Η μετατροπή του μαθήματος σε «Ανενεργό» αμέσως μετά την ανάρτηση των σημειώσεων.'
+      ],
+      correct: 0,
+      explanation: 'Ένα ΣΔΜ δεν πρέπει να περιορίζεται σε αποθετήριο διαφανειών. Η δομημένη οργάνωση (Θεματικές ενότητες / Ανεστραμμένη Τάξη), το καθοδηγητικό κείμενο και τα διαδραστικά εργαλεία (forum ετεροαξιολόγησης, H5P) ενεργοποιούν τη μάθηση.'
+    },
+    // Session 7
+    {
+      id: 'sc-7a', session: 7, tag: 'Υπολογιστικό Νέφος & ΠΣΔ',
+      prompt: 'Οργανώνεις ταυτόχρονη συνεργατική συγγραφή σε τάξη 25 μαθητών μέσω του Πανελλήνιου Σχολικού Δικτύου με την υπηρεσία «+γραφίς». Ποιο κρίσιμο τεχνικό όριο πρέπει να έχεις υπόψη σου;',
+      options: [
+        'Αν και είναι ασφαλής και πιστοποιημένη υπηρεσία ΠΣΔ, διαθέτει πανελλαδικό όριο 100 ταυτόχρονων χρηστών.',
+        'Απαιτεί πληρωμένη συνδρομή SaaS από κάθε μαθητή ξεχωριστά.',
+        'Δεν επιτρέπει σε μαθητές να γράφουν ταυτόχρονα στο ίδιο έγγραφο.',
+        'Διαγράφει αυτόματα τα κείμενα μετά από 10 λεπτά χωρίς αποθήκευση.'
+      ],
+      correct: 0,
+      explanation: 'Η «+γραφίς» του ΠΣΔ είναι ασφαλής και συμβατή με το θεσμικό πλαίσιο, αλλά έχει όριο 100 ταυτόχρονων χρηστών πανελλαδικά — χρήσιμη γνώση για τον προγραμματισμό μιας σχολικής ώρας.'
+    },
+    {
+      id: 'sc-7b', session: 7, tag: 'Εννοιολογικοί Χάρτες',
+      prompt: 'Σύμφωνα με τους Novak & Canas (7η Συνεδρία), τι μετατρέπει ένα απλό διάγραμμα «φυσαλίδων» σε γνήσιο Εννοιολογικό Χάρτη που ενισχύει τη βαθιά κατανόηση;',
+      options: [
+        'Οι ονοματισμένοι σύνδεσμοι (λέξεις-σύνδεσμοι) ανάμεσα στους κόμβους, ώστε κάθε δυάδα κόμβων + σύνδεσμος να συγκροτεί μια νοηματική πρόταση.',
+        'Η χρήση όσο το δυνατόν περισσότερων χρωμάτων και εικονιδίων χωρίς λεκτικές συνδέσεις.',
+        'Η παράθεση ολόκληρων παραγράφων μέσα σε κάθε κόμβο του χάρτη.',
+        'Η κατασκευή του αποκλειστικά από τον εκπαιδευτικό για απομνημόνευση από τους μαθητές.'
+      ],
+      correct: 0,
+      explanation: 'Στον Εννοιολογικό Χάρτη, οι κόμβοι (έννοιες) ενώνονται με λέξεις-συνδέσμους σχηματίζοντας προτάσεις· έτσι οι χάρτες λειτουργούν ως εργαλεία διαπραγμάτευσης νοήματος (περιγραφικοί και ιδίως επεξηγηματικοί).'
+    },
+    // Session 8
+    {
+      id: 'sc-8a', session: 8, tag: 'Πνευματικά Δικαιώματα & CC',
+      prompt: 'Βρίσκεις μια εξαιρετική εκπαιδευτική εικόνα σε ιστότοπο χωρίς κανένα σημείωμα πνευματικών δικαιωμάτων. Θέλεις να την ενσωματώσεις, να την τροποποιήσεις και να τη δημοσιεύσεις στο Φωτόδεντρο. Τι ισχύει νομικά (Ν. 2121/1993 & CC);',
+      options: [
+        'Προστατεύεται αυτόματα («με επιφύλαξη παντός δικαιώματος») χωρίς διατυπώσεις· για ελεύθερη προσαρμογή χρειάζεσαι άδεια (π.χ. CC BY ή CC BY-SA, όχι ND).',
+        'Εφόσον δεν φέρει το σύμβολο ©, ανήκει αυτόματα στο Δημόσιο Κτήμα (CC0).',
+        'Μπορείς να την τροποποιήσεις ελεύθερα ακόμα κι αν φέρει την άδεια CC BY-NC-ND.',
+        'Η εκπαιδευτική δημοσίευση στο διαδίκτυο εξαιρείται πλήρως από τη νομοθεσία πνευματικής ιδιοκτησίας.'
+      ],
+      correct: 0,
+      explanation: 'Η πνευματική ιδιοκτησία κατοχυρώνεται αυτόματα με τη δημιουργία του έργου. Για τροποποίηση/συνδυασμό (Revise/Remix στα 5R των ΑΕΠ) απαιτείται άδεια χωρίς τον όρο ND (Όχι Παράγωγα Έργα), π.χ. CC BY, CC BY-SA ή CC BY-NC-SA.'
+    },
+    {
+      id: 'sc-8b', session: 8, tag: 'Αποθετήρια (Πρωτέας & Φωτόδεντρο)',
+      prompt: 'Πώς προτείνει η 8η Συνεδρία να αξιοποιεί ένας φιλόλογος τα έτοιμα εκπαιδευτικά σενάρια των αποθετηρίων «Πρωτέας» (ΚΕΓ), «Φωτόδεντρο LS» και «Αίσωπος»;',
+      options: [
+        'Ως ανοιχτά πρότυπα προς κριτική προσαρμογή και αναπλαισίωση στις ανάγκες του δικού του τμήματος — όχι ως «πάρε-κάνε» ή «τυφλοσούρτη».',
+        'Ως υποχρεωτικές συνταγές που πρέπει να εκτελεστούν κατά γράμμα χωρίς καμία τροποποίηση.',
+        'Μόνο για να κατεβάζει ασκήσεις πολλαπλής επιλογής για διαγωνίσματα τριμήνου.',
+        'Αποκλειστικά τα σενάρια που φέρουν τη βαθμολογία «Επαρκή» (50–69,5) στον Αίσωπο.'
+      ],
+      correct: 0,
+      explanation: 'Τα σενάρια στον Πρωτέα (που έχουν περάσει διπλή εφαρμογή στην τάξη) και στο Φωτόδεντρο LS (άδεια CC BY-NC-SA) σχεδιάστηκαν για επαναχρησιμοποίηση και δημιουργική προσαρμογή, ποτέ ως μηχανικός «τυφλοσούρτης».'
+    },
+    // Session 9
+    {
+      id: 'sc-9a', session: 9, tag: 'Σχεδιασμός Προτροπών (Prompts)',
+      prompt: 'Ζητάς από ένα Μεγάλο Γλωσσικό Μοντέλο (LLM) να βοηθήσει στον σχεδιασμό μιας φιλολογικής δραστηριότητας. Σύμφωνα με τα 9 βήματα (Palaigeorgiou & Veletsianos, 2023), ποια στρατηγική δίνει το πιο αξιόπιστο αποτέλεσμα;',
+      options: [
+        'Σαφής ορισμός ρόλου, κοινού, εργασίας, πλαισίου, ύφους, μορφής εξόδου και κριτική επικύρωση/αναθεώρηση της απάντησης από τον εκπαιδευτικό.',
+        'Μια μονολεκτική εντολή («φτιάξε μάθημα Οδύσσειας») και απευθείας αντιγραφή στη σχολική τάξη.',
+        'Η παράλειψη του πλαισίου και της ηλικίας των μαθητών ώστε το μοντέλο να αυτοσχεδιάσει.',
+        'Η εμπιστοσύνη στη «συνείδηση» του μοντέλου, καθώς τα LLMs κατανοούν πλήρως το νόημα του κειμένου.'
+      ],
+      correct: 0,
+      explanation: 'Τα LLMs προβλέπουν στατιστικά την επόμενη λέξη (δεν «κατανοούν» νοηματικά). Η δομημένη προτροπή 9 βημάτων (ρόλος, κοινό, εργασία, προσέγγιση, πλαίσιο, δεδομένα εισόδου, ύφος, μορφή εξόδου, επικύρωση) εξασφαλίζει ποιότητα και παιδαγωγικό έλεγχο.'
+    },
+    {
+      id: 'sc-9b', session: 9, tag: 'VR vs AR στη Φιλολογία',
+      prompt: 'Μια τάξη Ιστορίας/Λογοτεχνίας θέλει (Α) να στήσει ένα 3D ιδεατό μουσείο με εκθέματα του 1821 και (Β) να εμπλουτίσει σελίδες του σχολικού βιβλίου με ψηφιακά βίντεο που εμφανίζονται μόλις σκαναριστούν με κινητό. Ποιο ζεύγος εργαλείων ταιριάζει;',
+      options: [
+        '(Α) Artsteps (VR ιδεατό μουσείο) και (Β) ARTutor ή SchoolAR (AR επαύξηση φυσικού βιβλίου).',
+        '(Α) Bee-Bot (ρομπότ εδάφους) και (Β) Tinkercad (3D εκτύπωση).',
+        '(Α) Open eClass και (Β) MyFiles ΠΣΔ.',
+        '(Α) Google Scholar και (Β) Liddell & Scott.'
+      ],
+      correct: 0,
+      explanation: 'Το Artsteps επιτρέπει τη δημιουργία εικονικών εκθέσεων/μουσείων (VR), ενώ τα ARTutor (ΔΙΠΑΕ) και SchoolAR εμπλουτίζουν έντυπα σχολικά βιβλία ή φυσικά αντικείμενα με ψηφιακά επίπεδα Επαυξημένης Πραγματικότητας (AR).'
+    },
+    // Session 10
+    {
+      id: 'sc-10a', session: 10, tag: 'Κοινότητες Πρακτικής (Wenger)',
+      prompt: 'Ένας διευθυντής υποχρεώνει με πράξη συλλόγου όλους τους φιλολόγους να γράφουν 2 αναρτήσεις την εβδομάδα σε ένα forum. Γιατί, σύμφωνα με τη 10η Συνεδρία, αυτό ΔΕΝ συγκροτεί γνήσια Κοινότητα Πρακτικής;',
+      options: [
+        'Γιατί η Κοινότητα Πρακτικής στηρίζεται στην εθελοντική συμμετοχή, το κοινό πεδίο/ενδιαφέρον, την αμοιβαία εμπλοκή και τη σταδιακή νόμιμη περιφερειακή συμμετοχή (Lave & Wenger) — όχι σε επιβεβλημένη ομάδα εργασίας.',
+        'Γιατί στις Κοινότητες Πρακτικής απαγορεύεται η συμμετοχή νεοεισερχόμενων («ενεδρευόντων» / lurkers).',
+        'Γιατί οι Κοινότητες Πρακτικής υπάρχουν μόνο σε κοινωνικά δίκτυα όπως το TikTok και όχι σε forum.',
+        'Γιατί ο αριθμός των αναρτήσεων είναι πολύ μικρός (χρειάζονται τουλάχιστον 10 την εβδομάδα).'
+      ],
+      correct: 0,
+      explanation: 'Οι Κοινότητες Πρακτικής (Wenger, 1998: Πεδίο–Κοινότητα–Πρακτική) είναι εθελοντικές και ζουν από την εσωτερική ανάγκη των μελών. Ακόμα και οι αρχικά σιωπηλοί παρατηρητές (lurkers) συμμετέχουν νόμιμα περιφερειακά ώσπου να γίνουν ενεργά μέλη.'
+    },
+    {
+      id: 'sc-10b', session: 10, tag: 'Κριτική Αλγορίθμων',
+      prompt: 'Οι μαθητές παρατηρούν ότι δύο συμμαθητές που αναζητούν το ίδιο κοινωνικό θέμα στα κοινωνικά δίκτυα βλέπουν εντελώς διαφορετικές, μονομερείς απόψεις. Ποια φαινόμενα της 10ης Συνεδρίας εξηγούν το γεγονός;',
+      options: [
+        'Τις «φούσκες φίλτρων» (filter bubbles) και τους «θαλάμους ηχούς» (echo chambers) που δημιουργούν οι αλγόριθμοι προσωποποίησης.',
+        'Το μοντέλο 3Ε (Ενίσχυση–Επέκταση–Ενδυνάμωση) της κοινότητας «Διάλογος» του ΚΕΓ.',
+        'Τη διαδικασία πραγμοποίησης (reification) της συλλογικής γνώσης στα Wikis.',
+        'Το μοντέλο επιμόρφωσης cascade model (αλυσιδωτής διάχυσης).'
+      ],
+      correct: 0,
+      explanation: 'Οι αλγόριθμοι των κοινωνικών δικτύων μεγιστοποιούν την παραμονή στην πλατφόρμα εγκλωβίζοντας τους χρήστες σε filter bubbles και echo chambers. Η δράση «Πώς με βλέπει ο αλγόριθμος» καλλιεργεί ακριβώς αυτή την κριτική επίγνωση.'
+    },
+    // Session 11
+    {
+      id: 'sc-11a', session: 11, tag: 'Ασφάλεια vs Διαπαιδαγώγηση',
+      prompt: 'Ένα σχολείο μπλοκάρει λέξεις-κλειδιά με φίλτρο ώστε να προστατέψει τους μαθητές, αλλά καταλήγει να μπλοκάρει κατά λάθος σελίδα αστεροσκοπείου που γράφει «παρατήρηση με γυμνό οφθαλμό». Τι διδάσκει αυτό το παράδειγμα της 11ης Συνεδρίας;',
+      options: [
+        'Τα τεχνικά φίλτρα (λίστες λέξεων, walled gardens) είναι χρήσιμα αλλά ανεπαρκή από μόνα τους· απαιτείται κυρίως διαπαιδαγώγηση και κριτική ικανότητα (αναλογία της «θάλασσας»).',
+        'Πρέπει να καταργηθεί η πρόσβαση στο διαδίκτυο σε όλα τα σχολεία.',
+        'Τα συστήματα PEGI και ICRA έχουν σχεδιαστεί αποκλειστικά για ιστοσελίδες αστρονομίας.',
+        'Η μοναδική λύση είναι η προσθήκη ακόμη πιο αυστηρών απαγορευμένων λέξεων.'
+      ],
+      correct: 0,
+      explanation: 'Όπως μαθαίνουμε στα παιδιά κολύμπι αντί να τα κρατάμε μακριά από τη θάλασσα, έτσι και στο διαδίκτυο τα τεχνικά μέσα πρέπει να συνδυάζονται με διαπαιδαγώγηση, κριτικό γραμματισμό και βιωματικές δράσεις (όπως το παιχνίδι ρόλων «δενείσαισυ»).'
+    },
+    {
+      id: 'sc-11b', session: 11, tag: 'Προβλήματα ΤΝ & Cognitive Outsourcing',
+      prompt: 'Μαθητές αναθέτουν συστηματικά σε chatbot όχι απλώς να ελέγξει την ορθογραφία, αλλά να σκεφτεί τα επιχειρήματα, να δομήσει και να γράψει εξ ολοκλήρου τις εκθέσεις τους. Πώς διακρίνει η 11η Συνεδρία αυτή τη στάση;',
+      options: [
+        'Ως γνωστική εκχώρηση (cognitive outsourcing) — παραίτηση από την ίδια τη σκέψη — σε αντίθεση με τη στοχευμένη γνωστική αποφόρτιση (cognitive offloading).',
+        'Ως θεμιτή χρήση του AI Act της ΕΕ στην κατηγορία «μηδενικού κινδύνου».',
+        'Ως εφαρμογή του German Commons για τη μείωση της αλγοριθμικής μεροληψίας.',
+        'Ως ισοδύναμο με τη χρήση ορθογραφικού λεξικού σε κειμενογράφο.'
+      ],
+      correct: 0,
+      explanation: 'Η 11η Συνεδρία αντιδιαστέλλει το cognitive offloading (ελαφρύνω δευτερεύον γνωστικό φορτίο) από το cognitive outsourcing (εκχωρώ στην ΤΝ τη βασική κριτική σκέψη και σύνθεση), που υπονομεύει τη μάθηση και τη γνωστική αυτονομία.'
+    },
+    // Session 12
+    {
+      id: 'sc-12a', session: 12, tag: 'Στοχαστικό-Κριτικό Μοντέλο',
+      prompt: 'Κατά τον τελικό αναστοχασμό (12η Συνεδρία), ένας εκπαιδευτικός χρησιμοποιεί εντυπωσιακά ψηφιακά εργαλεία και μιλά για «καινοτομία», αλλά ο ίδιος καλύπτει το 90% του χρόνου μιλώντας, ενώ οι μαθητές εκτελούν απλές διεκπεραιωτικές εντολές. Τι αποκαλύπτει το στοχαστικό-κριτικό μοντέλο;',
+      options: [
+        'Ότι οι παραδοσιακές δασκαλοκεντρικές αντιλήψεις μπορούν να συνυπάρχουν με «προοδευτική» τεχνοκεντρική ρητορεία· κριτήριο επιτυχίας είναι ο χρόνος και ο ενεργός ρόλος των μαθητών.',
+        'Ότι η διδασκαλία είναι απολύτως επιτυχημένη εφόσον αξιοποιήθηκαν σύγχρονες ΨΤ.',
+        'Ότι οι μαθητές πρέπει να έχουν διεκπεραιωτικό ρόλο ώστε να προλαβαίνει ο εκπαιδευτικός να καλύψει τη διδακτέα ύλη.',
+        'Ότι η τεχνολογία επιβάλλει αυτόματα δημοκρατικές πρακτικές στην τάξη.'
+      ],
+      correct: 0,
+      explanation: 'Η 12η Συνεδρία υπογραμμίζει πως η τεχνοκεντρική ρητορεία συχνά συγκαλύπτει παραδοσιακές πρακτικές. Όσο περισσότερο χρόνο παίρνουν οι μαθητές για να παρουσιάζουν, να συνθέτουν και να συνεργάζονται, τόσο πιο επιτυχημένη είναι η διδασκαλία.'
+    },
+    {
+      id: 'sc-12b', session: 12, tag: 'Συνολική Ανάγνωση Σχολικού Χρόνου',
+      prompt: 'Ένας φιλόλογος ανησυχεί ότι δεν προλαβαίνει να κάνει μεγάλα ψηφιακά project σε μεμονωμένα 45λεπτα. Ποια λύση προτείνει η 12η Συνεδρία;',
+      options: [
+        'Συνολική ανάγνωση του σχολικού χρόνου σε επίπεδο χρονιάς: μικροεργασίες που εξελίσσονται και παρουσιάζονται ανά διαστήματα, και αξιοποίηση άτυπων σχολικών πρακτικών (εκδρομές, γιορτές).',
+        'Αποκλειστική χρήση κουίζ πολλαπλής επιλογής διάρκειας 5 λεπτών στο τέλος κάθε ώρας.',
+        'Μεταφορά όλων των μαθημάτων εκτός σχολικού ωραρίου τα Σαββατοκύριακα.',
+        'Εγκατάλειψη των ΨΤ μέχρι να αλλάξει ριζικά το ωρολόγιο πρόγραμμα.'
+      ],
+      correct: 0,
+      explanation: 'Η «συνολική ανάγνωση του σχολικού χρόνου» ξεπερνά τον ασφυκτικό ορίζοντα του ενός 45λεπτου: συνδέει σπειροειδείς μικροεργασίες μέσα στη χρονιά και αξιοποιεί τα «σημεία ανοικτότητας» (γιορτές, εκδρομές, Εργαστήρια Δεξιοτήτων).'
+    }
+  ];
+
+  // 24 Myth or Truth Statements (2 per session across all 12 sessions)
+  const BLITZ_ITEMS = [
+    // S1
+    { id: 'bl-1a', session: 1, statement: 'Το ευρωπαϊκό πλαίσιο DigComp 3.0 οργανώνεται σε 5 περιοχές και 21 ψηφιακές ικανότητες για όλους τους πολίτες.', isTrue: true, explanation: 'Σωστό! Το DigComp 3.0 (πολίτες) έχει 5 περιοχές, 21 ικανότητες και 4 επίπεδα επάρκειας, με ανανεωμένη έμφαση σε ΤΝ, ψηφιακά δικαιώματα και βιωσιμότητα.' },
+    { id: 'bl-1b', session: 1, statement: 'Οι ψηφιακές τεχνολογίες είναι απολύτως ουδέτερα μέσα, επομένως η ένταξή τους στην τάξη δεν απαιτεί κριτικό γραμματισμό.', isTrue: false, explanation: 'Μύθος! Η 3η εκδοχή διδακτικής ιδεολογίας στην 1η Συνεδρία τονίζει ρητά ότι οι ΨΤ ΔΕΝ είναι ουδέτερα μέσα — ενσωματώνουν αξίες, αλγορίθμους και συμφέροντα.' },
+    // S2
+    { id: 'bl-2a', session: 2, statement: 'Η «Μνημοσύνη» του ΚΕΓ περιλαμβάνει αρχαιοελληνικά κείμενα με παράλληλες μεταφράσεις, τα οποία όμως δεν είναι λημματοποιημένα.', isTrue: true, explanation: 'Σωστό! Σε αντίθεση με το Σώμα ΚΕΓ (7 εκ. τύποι, λημματοποιημένα), η «Μνημοσύνη» περιέχει μη λημματοποιημένα αρχαιοελληνικά κείμενα και παράλληλες μεταφράσεις.' },
+    { id: 'bl-2b', session: 2, statement: 'Η Χελωνόσφαιρα (MaLT2) ανήκει στην Κατηγορία Α2 (λογισμικά εξάσκησης και πρακτικής / drill & practice).', isTrue: false, explanation: 'Μύθος! Η Χελωνόσφαιρα (MaLT2 σε 3D Logo) ανήκει στην Κατηγορία Γ ως Ψηφιακό Εργαλείο Έκφρασης (ΨΕΕ) που προάγει τη συμβολική έκφραση και τη διερεύνηση.' },
+    // S3
+    { id: 'bl-3a', session: 3, statement: 'Στο ακρωνύμιο STEAM, το «A» (Art) χρησιμοποιείται μετωνυμικά για να συμπεριλάβει ευρύτερα τις ανθρωπιστικές και κοινωνικές επιστήμες.', isTrue: true, explanation: 'Σωστό! Στην 3η Συνεδρία επισημαίνεται ότι το «A» στο STEAM ανοίγει τη διεπιστημονικότητα στις τέχνες και τις ανθρωπιστικές/φιλολογικές επιστήμες.' },
+    { id: 'bl-3b', session: 3, statement: 'Ο Seymour Papert εισηγήθηκε τον συμπεριφορισμό και τη μέθοδο audiolingualism για τη διδασκαλία ξένων γλωσσών.', isTrue: false, explanation: 'Μύθος! Ο Seymour Papert εισηγήθηκε τον κατασκευαστικό εποικοδομισμό / δομιτισμό (constructionism) και τη γλώσσα Logo (1969).' },
+    // S4
+    { id: 'bl-4a', session: 4, statement: 'Το Φύλλο Εργασίας είναι το μοναδικό τμήμα ενός εκπαιδευτικού σεναρίου που απευθύνεται άμεσα στους μαθητές.', isTrue: true, explanation: 'Σωστό! Το υπόλοιπο σενάριο απευθύνεται στον εκπαιδευτικό, ενώ το φύλλο εργασίας μιλά στους μαθητές — και δεν πρέπει να είναι «μεταμφιεσμένες ερωτήσεις του σχολικού βιβλίου».' },
+    { id: 'bl-4b', session: 4, statement: 'Η δραστηριότητα σε ένα σενάριο είναι ένα πλήρως αυτόνομο κομμάτι που δεν χρειάζεται να συνδέεται με τις υπόλοιπες φάσεις.', isTrue: false, explanation: 'Μύθος! Η δραστηριότητα είναι το «κύτταρο της διδασκαλίας» με σαφή χρονικά όρια, αλλά αποτελεί οργανικό μέλος της φάσης και του ευρύτερου σεναρίου.' },
+    // S5
+    { id: 'bl-5a', session: 5, statement: 'Η ονοματοποίηση και ο ελλειπτικός λόγος αποτελούν βασικές κειμενικές ιδιαιτερότητες μιας καλοσχεδιασμένης διαφάνειας παρουσίασης.', isTrue: true, explanation: 'Σωστό! Η διαφάνεια υποστηρίζει τον προφορικό λόγο με πυκνή, λιτή διατύπωση (ονοματοποίηση, λέξεις-κλειδιά) και όχι με εκτεταμένες παραγράφους.' },
+    { id: 'bl-5b', session: 5, statement: 'Στα 5 βήματα κριτικής αξιοποίησης ΤΝ για παρουσιάσεις, οι μαθητές ζητούν πρώτα έτοιμη παρουσίαση από την ΤΝ και μετά αποφασίζουν το θέμα τους.', isTrue: false, explanation: 'Μύθος! Πρώτα σχεδιάζουν οι ίδιοι οι μαθητές/εκπαιδευτικός τη δομή και τις ιδέες, έπειτα συγκρίνουν με την πρόταση της ΤΝ και προχωρούν σε κριτική αναθεώρηση.' },
+    // S6
+    { id: 'bl-6a', session: 6, statement: 'Στην πλατφόρμα e-me, η μοναδική εφαρμογή όπου υπάρχει δομική διαφοροποίηση ρόλων εκπαιδευτικού–μαθητή είναι οι εργασίες (e-me assignments).', isTrue: true, explanation: 'Σωστό! Η e-me βασίζεται σε ισότιμη φιλοσοφία PLE· το e-me assignments εισάγει σκόπιμα διακριτούς ρόλους ανάθεσης/υποβολής (ενώ στη Βιβλιοθήκη Κυψέλης αναρτούν Υπεύθυνος/Βοηθοί).' },
+    { id: 'bl-6b', session: 6, statement: 'Στο e-class, το εργαλείο e-me content παρέχει αποθηκευτικό χώρο 2GB σε NextCloud του ΕΔΥΤΕ.', isTrue: false, explanation: 'Μύθος! Αυτά ανήκουν στην e-me: το e-me files (NextCloud) δίνει 2GB αποθήκευση στο ΕΔΥΤΕ, ενώ το e-me content αφορά ~45 τύπους διαδραστικών αντικειμένων H5P.' },
+    // S7
+    { id: 'bl-7a', session: 7, statement: 'Η ψηφιακή «ρευστότητα» του κειμενογράφου εναρμονίζεται με το κίνημα «το γράψιμο ως διαδικασία» (writing process) της δεκαετίας του 1980.', isTrue: true, explanation: 'Σωστό! Η ευκολία αναθεώρησης, μετακίνησης και επεξεργασίας αναδεικνύει τη γραφή ως μη γραμμική διαδικασία με επάλληλα στάδια.' },
+    { id: 'bl-7b', session: 7, statement: 'Στα Wikis οι δημοσιεύσεις οργανώνονται υποχρεωτικά σε ανεστραμμένη χρονολογική σειρά, όπως στα ιστολόγια (blogs).', isTrue: false, explanation: 'Μύθος! Η ανεστραμμένη χρονολογική σειρά είναι χαρακτηριστικό των blogs. Τα Wikis οργανώνουν συλλογική γνώση σε διασυνδεδεμένες σελίδες με ιστορικό αναθεωρήσεων.' },
+    // S8
+    { id: 'bl-8a', session: 8, statement: 'Τα 5R των Ανοιχτών Εκπαιδευτικών Πόρων (ΑΕΠ/OER) είναι: Retain, Reuse, Revise, Remix και Redistribute.', isTrue: true, explanation: 'Σωστό! Διατήρηση, Επαναχρησιμοποίηση, Προσαρμογή, Συνδυασμός και Αναδιανομή συνθέτουν τις 5 ελευθερίες των ΑΕΠ.' },
+    { id: 'bl-8b', session: 8, statement: 'Ένας Συσσωρευτής Μεταδεδομένων (όπως ο Εθνικός Συσσωρευτής Φωτόδεντρο) αποθηκεύει τοπικά όλα τα πρωτότυπα αρχεία βίντεο και κειμένων.', isTrue: false, explanation: 'Μύθος! Οι συσσωρευτές συγκεντρώνουν μόνο τα μεταδεδομένα (π.χ. πρότυπο IEEE LOM) και παραπέμπουν στα πρωτότυπα αποθετήρια.' },
+    // S9
+    { id: 'bl-9a', session: 9, statement: 'Το ελληνικό μοντέλο Llama-Krikri (διάδοχος του Meltemi) αναπτύχθηκε από το ΙΕΛ/ΑΡΧΙΜΗΔΗΣ στο πλαίσιο της ελληνικής προσπάθειας για ανοιχτή ΤΝ.', isTrue: true, explanation: 'Σωστό! Μαζί με το εθνικό έργο «Φάρος AI Factory» και τον υπερυπολογιστή «Δαίδαλος» στο Λαύριο, αποτελούν εμβληματικές ελληνικές πρωτοβουλίες ΤΝ.' },
+    { id: 'bl-9b', session: 9, statement: 'Η Επαυξημένη Πραγματικότητα (AR) απομονώνει πλήρως τον χρήστη σε έναν 100% τεχνητό ψηφιακό κόσμο (εμβύθιση).', isTrue: false, explanation: 'Μύθος! Η πλήρης εμβύθιση σε τεχνητό κόσμο είναι χαρακτηριστικό της Εικονικής Πραγματικότητας (VR). Η AR επαυξάνει τον φυσικό κόσμο με ψηφιακές πληροφορίες.' },
+    // S10
+    { id: 'bl-10a', session: 10, statement: 'Κατά τους Palloff & Pratt (2005), οι σύγχρονες συσκέψεις/συναντήσεις αποτελούν την «ψυχή» μιας διαδικτυακής κοινότητας.', isTrue: true, explanation: 'Σωστό! Η τακτική σύγχρονη αλληλεπίδραση ενισχύει το αίσθημα του «ανήκειν» και διατηρεί ζωντανή την κοινότητα.' },
+    { id: 'bl-10b', session: 10, statement: 'Το Mastodon είναι εμπορικό κλειστού κώδικα δίκτυο microblogging που ανήκει στην ίδια εταιρεία με το Instagram.', isTrue: false, explanation: 'Μύθος! Το Mastodon είναι αποκεντρωμένο δίκτυο microblogging ανοιχτού κώδικα (σε αντίθεση με τα Threads/Instagram της Meta ή το X).' },
+    // S11
+    { id: 'bl-11a', session: 11, statement: 'Ο Ευρωπαϊκός Κανονισμός για την ΤΝ (AI Act, 2024) κατηγοριοποιεί τα συστήματα ΤΝ σε 4 επίπεδα κινδύνου, συν κανόνες για ΤΝ γενικής χρήσης.', isTrue: true, explanation: 'Σωστό! Το AI Act (2024) θεσπίζει κλιμακωτές υποχρεώσεις με βάση 4 επίπεδα κινδύνου (απαράδεκτος, υψηλός, περιορισμένος, ελάχιστος) και ρυθμίζει τα μοντέλα γενικής χρήσης.' },
+    { id: 'bl-11b', session: 11, statement: 'Ο όρος «griefbots / memorybots» αναφέρεται σε αυτοματοποιημένα εργαλεία ελέγχου ψευδών ειδήσεων (fact-checking).', isTrue: false, explanation: 'Μύθος! Τα griefbots/memorybots είναι συστήματα ΤΝ που προσομοιώνουν αποβιώσαντα πρόσωπα, εγείροντας σοβαρά ηθικά και ψυχολογικά ζητήματα συναισθηματικής εξάρτησης.' },
+    // S12
+    { id: 'bl-12a', session: 12, statement: 'Σύμφωνα με τη 12η Συνεδρία, η διδασκαλία αποτυγχάνει όταν ο εκπαιδευτικός γεμίζει σχεδόν όλο τον διδακτικό χρόνο και οι μαθητές έχουν απλώς διεκπεραιωτικό ρόλο.', isTrue: true, explanation: 'Σωστό! Το κλειδί στον αναστοχασμό είναι η κατανομή ρόλων: η μάθηση ανθίζει όταν οι μαθητές έχουν χρόνο να ερευνούν, να συνθέτουν, να συνεργάζονται και να παρουσιάζουν.' },
+    { id: 'bl-12b', session: 12, statement: 'Η αξιοποίηση άτυπων σχολικών πρακτικών (εκδρομές, σχολικές γιορτές) θεωρείται χάσιμο χρόνου και πρέπει να αποφεύγεται στον σχεδιασμό με ΨΤ.', isTrue: false, explanation: 'Μύθος! Οι εκδρομές, οι γιορτές και τα Εργαστήρια Δεξιοτήτων είναι πολύτιμα «εν δυνάμει σημεία ανοικτότητας» (Bernstein) για αυθεντικές ψηφιακές δράσεις.' }
+  ];
+
+  // 24 Matching Pairs organized into 4 thematic packs (6 pairs each, spanning all 12 sessions)
+  const MATCHING_PACKS = [
+    {
+      id: 'pack-1', title: 'Πακέτο 1: Θεωρητικοί & Πλαίσια (Συν. 1–4)', icon: '🧠',
+      pairs: [
+        { id: 'm1', session: 1, left: 'DigCompEdu', right: '6 τομείς ψηφιακής ικανότητας εκπαιδευτικών (πυρήνας 2–5)' },
+        { id: 'm2', session: 2, left: 'Ανεμόσκαλα (ΚΕΓ)', right: 'Συμφραστικοί πίνακες νεοελληνικής ποίησης (* / %)' },
+        { id: 'm3', session: 3, left: 'L. S. Vygotsky', right: 'Ζώνη Επικείμενης Ανάπτυξης (ΖΕΑ) & Γνωστική Σκαλωσιά' },
+        { id: 'm4', session: 3, left: 'S. Papert', right: 'Κατασκευαστικός εποικοδομισμός (Constructionism) & Logo' },
+        { id: 'm5', session: 4, left: 'Πυλώνες FLIP', right: 'Ευέλικτο περιβάλλον, Κουλτούρα, Περιεχόμενο, Επαγγελματίας' },
+        { id: 'm6', session: 2, left: 'Διδακτική αναπλαισίωση', right: 'Αλλαγή κατηγορίας εργαλείου ανάλογα με τον σχεδιασμό' }
+      ]
+    },
+    {
+      id: 'pack-2', title: 'Πακέτο 2: Πλατφόρμες & Συνεργασία (Συν. 5–7)', icon: '🏛️',
+      pairs: [
+        { id: 'm7', session: 5, left: 'Αρχές Mayer (2020)', right: 'Περιορισμός πλεονασμού, οπτική επισήμανση, τμηματοποίηση' },
+        { id: 'm8', session: 6, left: 'Open eClass', right: 'Αρθρωτή δομή τύπου Lego Bricks · Ηλεκτρονικό Μάθημα' },
+        { id: 'm9', session: 6, left: 'e-me (PLE)', right: 'Κυψέλες, ισότιμη σχέση (εξαίρεση: e-me assignments)' },
+        { id: 'm10', session: 7, left: 'IaaS / PaaS / SaaS', right: 'Τα 3 βασικά μοντέλα υπηρεσιών Υπολογιστικού Νέφους' },
+        { id: 'm11', session: 7, left: 'SchoolPress (ΠΣΔ)', right: 'Πλατφόρμα ηλεκτρονικών σχολικών περιοδικών & εφημερίδων' },
+        { id: 'm12', session: 7, left: 'Novak & Canas', right: 'Εννοιολογικοί χάρτες: κόμβοι + σύνδεσμοι = πρόταση' }
+      ]
+    },
+    {
+      id: 'pack-3', title: 'Πακέτο 3: Αποθετήρια & Αναδυόμενες ΨΤ (Συν. 8–9)', icon: '🚀',
+      pairs: [
+        { id: 'm13', session: 8, left: 'CC BY-NC-ND', right: 'Η πιο περιοριστική από τις 6 άδειες Creative Commons' },
+        { id: 'm14', session: 8, left: 'Πρωτέας (ΚΕΓ)', right: 'Γλωσσικά σενάρια με διπλή εφαρμογή στην τάξη' },
+        { id: 'm15', session: 8, left: 'IEEE LOM', right: 'Πρότυπο μεταδεδομένων Μαθησιακών Αντικειμένων' },
+        { id: 'm16', session: 9, left: 'ARTutor (ΔΙΠΑΕ)', right: 'Εργαλείο Επαυξημένης Πραγματικότητας (AR) για βιβλία' },
+        { id: 'm17', session: 9, left: 'Artsteps', right: 'Δημιουργία 3D ιδεατών μουσείων & εκθέσεων (VR)' },
+        { id: 'm18', session: 9, left: 'Φάρος & Δαίδαλος', right: 'Ελληνικό AI Factory και υπερυπολογιστής στο Λαύριο' }
+      ]
+    },
+    {
+      id: 'pack-4', title: 'Πακέτο 4: Κοινότητες, Ασφάλεια & Αναστοχασμός (Συν. 10–12)', icon: '🛡️',
+      pairs: [
+        { id: 'm19', session: 10, left: 'Wenger (1998)', right: 'Κοινότητα Πρακτικής: Πεδίο – Κοινότητα – Πρακτική' },
+        { id: 'm20', session: 10, left: 'Διάλογος (ΚΕΓ) — 3Ε', right: 'Μοντέλο Ενίσχυσης – Επέκτασης – Ενδυνάμωσης' },
+        { id: 'm21', session: 11, left: 'Παιχνίδι «δενείσαισυ»', right: 'Παιχνίδι ρόλων για κατανόηση της διαδικτυακής ανωνυμίας' },
+        { id: 'm22', session: 11, left: 'German Commons', right: 'Ανοιχτό, νομικά καθαρό σώμα δεδομένων εκπαίδευσης ΤΝ' },
+        { id: 'm23', session: 11, left: 'Cognitive Outsourcing', right: 'Εκχώρηση της ίδιας της κριτικής σκέψης στην ΤΝ' },
+        { id: 'm24', session: 12, left: 'Στοχαστικό-κριτικό μοντέλο', right: 'Αποδόμηση τεχνοκεντρικής ρητορείας & εστίαση στους ρόλους' }
+      ]
+    }
+  ];
+
+  // 24 High-Yield Flashcards (2 per session across all 12 sessions)
+  const FLASHCARDS = [
+    { id: 'fc-1', session: 1, front: 'Ποια είναι τα 3 μοντέλα εισαγωγής ΨΤ στην εκπαίδευση;', back: '1) Τεχνοκρατικό/τεχνοκεντρικό (έμφαση στο μέσο), 2) Ολιστικό (έμφαση σε παιδαγωγικούς/κοινωνικούς στόχους), 3) Πραγματολογικό (συνδυαστική προσέγγιση).' },
+    { id: 'fc-2', session: 1, front: 'Τι διακρίνει το DigComp 3.0 από το DigCompEdu;', back: 'Το DigComp 3.0 αφορά όλους τους πολίτες (5 περιοχές, 21 ικανότητες, 4 επίπεδα, έμφαση σε ΤΝ & δικαιώματα), ενώ το DigCompEdu εξειδικεύεται στους εκπαιδευτικούς (6 τομείς, παιδαγωγικός πυρήνας 2–5).' },
+    { id: 'fc-3', session: 2, front: 'Ποιες είναι οι 3 μεγάλες κατηγορίες εκπαιδευτικών εργαλείων–περιβαλλόντων;', back: 'Α) Καθοδηγούμενη διδασκαλία (tutorials, drill & practice, παρουσιάσεις, απλές πηγές), Β) Ανακάλυψη & διερεύνηση (λεξικά, corpora), Γ) Συμβολική έκφραση, παραγωγή λόγου, επικοινωνία & συνεργασία (ΨΕΕ).' },
+    { id: 'fc-4', session: 2, front: 'Ποια η διαφορά «Σώματος ΚΕΓ», «Μνημοσύνης» και «ΕΘΕΓ/ΙΕΛ»;', back: 'Σώμα ΚΕΓ: ~7 εκ. τύποι, λημματοποιημένα. Μνημοσύνη: αρχαιοελληνικά + παράλληλες μεταφράσεις, μη λημματοποιημένα. ΕΘΕΓ (ΙΕΛ): >47 εκ. λέξεις σύγχρονης ελληνικής.' },
+    { id: 'fc-5', session: 3, front: 'Πώς ορίζει ο Piaget τη γνωστική ανάπτυξη;', back: 'Μέσω των μηχανισμών αφομοίωσης, συμμόρφωσης και εξισορρόπησης. Η γνωστική σύγκρουση ενεργοποιεί την αναδόμηση των νοητικών σχημάτων.' },
+    { id: 'fc-6', session: 3, front: 'Τι είναι η Εγκαθιδρυμένη (Εμπλαισιωμένη) Γνώση;', back: 'Κατά τους Brown, Collins & Duguid, η γνώση συνδέεται άρρηκτα με το αυθεντικό κοινωνικοπολιτισμικό πλαίσιο και τις πρακτικές μέσα στις οποίες παράγεται και χρησιμοποιείται (γνωστική μαθητεία).' },
+    { id: 'fc-7', session: 4, front: 'Σε ποιους 3 άξονες εφαρμόζεται η Διαφοροποιημένη Διδασκαλία;', back: '1) Περιεχόμενο (ενδιαφέροντα, πολυτροπικότητα, οπτικές), 2) Διαδικασία (ετερογενείς ομάδες, ολομέλεια), 3) Μαθησιακό αποτέλεσμα/προϊόν. Δεν ταυτίζεται με απλή «διαβάθμιση δυσκολίας».' },
+    { id: 'fc-8', session: 4, front: 'Τι σημαίνει το ακρωνύμιο FLIP στην Ανεστραμμένη Τάξη;', back: 'F: Flexible Environment (Ευέλικτο περιβάλλον), L: Learning Culture (Κουλτούρα μάθησης), I: Intentional Content (Στοχευμένο περιεχόμενο), P: Professional Educator (Επαγγελματίας εκπαιδευτικός).' },
+    { id: 'fc-9', session: 5, front: 'Ποιες είναι οι βασικές πολυμεσικές αρχές του Mayer (2020) για παρουσιάσεις;', back: 'Αποφυγή άσχετων στοιχείων (συνοχή), οπτική επισήμανση βασικών σημείων, περιορισμός πλεονασμού (όχι ανάγνωση ίδιου κειμένου κατά λέξη) και τμηματοποίηση της πληροφορίας.' },
+    { id: 'fc-10', session: 5, front: 'Τι μορφές βιβλίων προσφέρει το ebooks.edu.gr;', back: 'Απλά HTML, εμπλουτισμένα HTML/PDF με διαδραστικά μαθησιακά αντικείμενα (από Φωτόδεντρο), i-books και ειδικά διαμορφωμένα PDF για μαθητές με αμβλυωπία.' },
+    { id: 'fc-11', session: 6, front: 'Ποιες 4 μορφές οργάνωσης μαθημάτων προσφέρει το Open eClass;', back: '1) Απλή μορφή, 2) Θεματικές ενότητες, 3) Τοίχος (wall) και 4) Ανεστραμμένη Τάξη. Στην αναβάθμιση 2025–2026 προστέθηκαν H5P, badges, e-portfolio και learning analytics.' },
+    { id: 'fc-12', session: 6, front: 'Ποιες βασικές εφαρμογές περιλαμβάνει το οικοσύστημα της e-me;', back: 'Κυψέλη, e-me content (~45 H5P), e-me files (2GB NextCloud), e-me assignments, e-me blogs, e-me Survey, e-me Library, e-me Whiteboard, e-me Annotation, e-me Badges, ΕΛεΦυΣ και Λεξικό Νοηματικής.' },
+    { id: 'fc-13', session: 7, front: 'Ποια είναι τα 5 χαρακτηριστικά του Υπολογιστικού Νέφους (Cloud);', back: '1) Αυτοεξυπηρέτηση κατ’ απαίτηση, 2) Ευρεία πρόσβαση δικτύου, 3) Διαθεσιμότητα/δεξαμενή πόρων, 4) Γρήγορη ευελιξία, 5) Μέτρηση υπηρεσιών.' },
+    { id: 'fc-14', session: 7, front: 'Τι είναι τα Blogs και τι τα Wikis στο Web 2.0;', back: 'Blogs: ανεστραμμένη χρονολογική σειρά, ετικέτες (tags), citizen journalism, ατομική/ομαδική φωνή. Wikis: συλλογική συγγραφή (collective knowledge), υπερσύνδεσμοι και πλήρες ιστορικό αναθεωρήσεων.' },
+    { id: 'fc-15', session: 8, front: 'Ποιοι είναι οι 4 όροι των αδειών Creative Commons;', back: 'BY (Αναφορά Δημιουργού), NC (Μη Εμπορική Χρήση), ND (Όχι Παράγωγα Έργα), SA (Παρόμοια Διανομή). Ο συνδυασμός τους παράγει 6 άδειες — από CC BY έως CC BY-NC-ND (συν CC0).' },
+    { id: 'fc-16', session: 8, front: 'Ποια είναι τα 5 αποθετήρια του Φωτόδεντρου;', back: '1) LOR+ (Μαθησιακά Αντικείμενα με έλεγχο ποιότητας), 2) UGC (e-yliko χρηστών), 3) LS (Εκπαιδευτικά Σενάρια CC BY-NC-SA), 4) OEP (Ανοιχτές Εκπαιδευτικές Πρακτικές), 5) i-create (Μαθητικές Δημιουργίες).' },
+    { id: 'fc-17', session: 9, front: 'Ποιοι είναι οι 3 άξονες της ΤΝ στην εκπαίδευση;', back: '1) Μάθηση με χρήση ΤΝ (π.χ. Betty’s Brain), 2) Μάθηση της ΤΝ (π.χ. Teachable Machine, δραστηριότητα «Ζέτο»), 3) Γραμματισμός στην ΤΝ (5 διαστάσεις + επαγγελματική διάσταση εκπαιδευτικών).' },
+    { id: 'fc-18', session: 9, front: 'Ποιες είναι οι 4 κατηγορίες Εκπαιδευτικής Ρομποτικής;', back: '1) Ρομπότ εδάφους (Bee-Bot, Thymio), 2) Κατασκευαστική ρομποτική (LEGO WeDo/Mindstorms), 3) Κοινωνικά/ανθρωποειδή ρομπότ (Nao, Aisoy, Poppy), 4) Μικροεπεξεργαστές/πλακέτες (Arduino, Micro:bit, Raspberry Pi).' },
+    { id: 'fc-19', session: 10, front: 'Ποιοι είναι οι 3 τρόποι ενίσχυσης του αισθήματος κοινότητας;', back: '1) Δημοκρατική διακυβέρνηση, 2) Δυνατός συντονιστικός πυρήνας, 3) Εξωτερική διαμεσολάβηση (π.χ. συντονιστές επιμόρφωσης).' },
+    { id: 'fc-20', session: 10, front: 'Ποια 3 μοντέλα αξιοποίησης της e-me ως εκπαιδευτικής κοινότητας προτείνονται;', back: '1) Μαθητικά projects & ανεστραμμένη τάξη, 2) Κύκλος ανάγνωσης λογοτεχνίας (με Audio Recorder & e-portfolio), 3) Όμιλοι με ορίζοντα τριετίας.' },
+    { id: 'fc-21', session: 11, front: 'Τι είναι οι «ψευδαισθήσεις» (hallucinations) των LLMs;', back: 'Αληθοφανείς αλλά κατασκευασμένες/αναληθείς πληροφορίες (επινοημένα DOI, αμνησία πηγής, φαινόμενο χιονοστιβάδας), που προκύπτουν επειδή τα μοντέλα προβλέπουν στατιστικά tokens χωρίς έλεγχο αλήθειας.' },
+    { id: 'fc-22', session: 11, front: 'Ποια ελληνικά & διεθνή εργαλεία αναφέρονται για fake news και ασφάλεια;', back: 'Έλεγχος ειδήσεων: ellinikahoaxes.gr, snopes.com. Ασφάλεια & κυβερνοεκφοβισμός: saferinternet4kids.gr, safeline, Δίωξη Ηλεκτρονικού Εγκλήματος, παιχνίδι «δενείσαισυ».' },
+    { id: 'fc-23', session: 12, front: 'Ποιο είναι το κεντρικό μήνυμα του στοχαστικού-κριτικού μοντέλου (12η Συνεδρία);', back: 'Η αποδόμηση της τεχνοκεντρικής ρητορείας: οι ΨΤ δεν εξασφαλίζουν από μόνες τους καινοτομία· καθοριστικός παράγοντας είναι το αν οι μαθητές αναλαμβάνουν ενεργό, δημιουργικό και συνεργατικό ρόλο.' },
+    { id: 'fc-24', session: 12, front: 'Πώς διαχειρίζεται ο εκπαιδευτικός τον σχολικό χρόνο σε βάθος χρονιάς;', back: 'Σχεδιάζει σπειροειδείς μικροεργασίες που εξελίσσονται και παρουσιάζονται ανά διαστήματα, ενσωματώνει άτυπες σχολικές πρακτικές (εκδρομές, γιορτές) και παραχωρεί ουσιαστικό χρόνο δράσης στους μαθητές.' }
+  ];
+
+  // Ranks & Badges
+  const RANKS = [
+    { minXp: 0, title: 'Αναγνώστης ΨΤ' },
+    { minXp: 150, title: 'Εξερευνητής Πηγών' },
+    { minXp: 350, title: 'Συνεργατικός Παιδαγωγός' },
+    { minXp: 650, title: 'Κριτικός Ψηφιακός Πολίτης' },
+    { minXp: 1000, title: 'Διδακτικός Σκηνοθέτης' },
+    { minXp: 1450, title: 'Μέντορας Β1.1' }
+  ];
+
+  const BADGES = [
+    { id: 'first-step', icon: '🌱', title: 'Πρώτο Βήμα', desc: 'Ολοκλήρωσε την πρώτη σου αποστολή συνεδρίας.' },
+    { id: 'streak-5', icon: '🔥', title: 'Σερί 5', desc: 'Πέτυχε 5 συνεχόμενες σωστές απαντήσεις.' },
+    { id: 'streak-10', icon: '⚡', title: 'Ασταμάτητος/η', desc: 'Πέτυχε 10 συνεχόμενες σωστές απαντήσεις.' },
+    { id: 'wing-A', icon: '🧭', title: 'Πτέρυγα Α (Συν. 1–3)', desc: 'Κατάκτησε τις Σφραγίδες των Συνεδριών 1, 2 και 3.' },
+    { id: 'wing-B', icon: '🏛️', title: 'Πτέρυγα Β (Συν. 4–6)', desc: 'Κατάκτησε τις Σφραγίδες των Συνεδριών 4, 5 και 6.' },
+    { id: 'wing-C', icon: '🚀', title: 'Πτέρυγα Γ (Συν. 7–9)', desc: 'Κατάκτησε τις Σφραγίδες των Συνεδριών 7, 8 και 9.' },
+    { id: 'wing-D', icon: '🛡️', title: 'Πτέρυγα Δ (Συν. 10–12)', desc: 'Κατάκτησε τις Σφραγίδες των Συνεδριών 10, 11 και 12.' },
+    { id: 'pair-master', icon: '🧩', title: 'Άρχοντας Αντιστοίχισης', desc: 'Ολοκλήρωσε ένα πακέτο αντιστοίχισης χωρίς κανένα λάθος.' },
+    { id: 'myth-buster', icon: '🎯', title: 'Κυνηγός Μύθων', desc: 'Σκόραρε τουλάχιστον 8 σωστές στην Αστραπή: Μύθος ή Αλήθεια.' },
+    { id: 'grand-master', icon: '👑', title: 'Μέντορας των 12 Συνεδριών', desc: 'Κατάκτησε τις Σφραγίδες και των 12 Συνεδριών Β1.1!' }
+  ];
+
+  // =========================================================================
+  // 2. PERSISTENT STATE & SOUND ENGINE (Web Audio API)
+  // =========================================================================
+
+  const STORAGE_KEY = 'b1_1_digital_director_v1';
+
+  const defaultState = () => ({
+    xp: 0,
+    streak: 0,
+    bestStreak: 0,
+    soundOn: true,
+    sessionProgress: {}, // { [sessionId]: { mastered: bool, bestScore: number, total: number, gold: bool } }
+    badges: [],
+    mistakes: [], // array of { type: 'scenario'|'blitz', id: string }
+    completedPacks: [],
+    bestBlitzScore: 0
+  });
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultState();
+      const parsed = JSON.parse(raw);
+      return { ...defaultState(), ...parsed };
+    } catch {
+      return defaultState();
+    }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch { /* ignore quota errors */ }
+  }
+
+  let state = loadState();
+  let activeTab = 'map';
+
+  // Subtle synthesized sound effects (no external audio dependencies)
+  let audioCtx = null;
+  function playTone(type) {
+    if (!state.soundOn) return;
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'ok') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.12);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.23);
+      } else if (type === 'err') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(155, now + 0.18);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.23);
+      } else if (type === 'fanfare') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.frequency.setValueAtTime(freq, now + i * 0.08);
+          g.gain.setValueAtTime(0.11, now + i * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.26);
+          o.start(now + i * 0.08);
+          o.stop(now + i * 0.08 + 0.27);
+        });
+      }
+    } catch { /* audio unavailable */ }
+  }
+
+  function showToast(msg, variant = 'primary') {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    const cls = variant === 'success' ? 'soft-success' : variant === 'warning' ? 'soft-warning' : 'soft-primary';
+    el.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-lg text-sm font-semibold animate-pop bg-[var(--card)] ${cls}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.25s ease';
+      setTimeout(() => el.remove(), 260);
+    }, 3200);
+  }
+
+  function shuffle(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // =========================================================================
+  // 3. PROGRESSION, XP, STREAKS, BADGES & MISTAKES
+  // =========================================================================
+
+  function awardAnswer(isCorrect, itemRef, baseXp = 25) {
+    if (isCorrect) {
+      state.streak += 1;
+      if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+      const bonus = Math.min(state.streak - 1, 5) * 5;
+      state.xp += baseXp + bonus;
+      // Clear from mistakes if present
+      if (itemRef) {
+        state.mistakes = state.mistakes.filter(m => !(m.type === itemRef.type && m.id === itemRef.id));
+      }
+      playTone('ok');
+    } else {
+      state.streak = 0;
+      if (itemRef && !state.mistakes.some(m => m.type === itemRef.type && m.id === itemRef.id)) {
+        state.mistakes.push(itemRef);
+      }
+      playTone('err');
+    }
+    checkBadges();
+    saveState();
+    updateHud();
+    return isCorrect ? (baseXp + Math.min(state.streak - 1, 5) * 5) : 0;
+  }
+
+  function unlockBadge(badgeId) {
+    if (state.badges.includes(badgeId)) return;
+    state.badges.push(badgeId);
+    const b = BADGES.find(x => x.id === badgeId);
+    if (b) {
+      playTone('fanfare');
+      showToast(`🏆 Νέο Τρόπαιο: ${b.icon} ${b.title}!`, 'success');
+    }
+  }
+
+  function checkBadges() {
+    const masteredIds = Object.keys(state.sessionProgress)
+      .map(Number)
+      .filter(id => state.sessionProgress[id]?.mastered);
+
+    if (masteredIds.length >= 1) unlockBadge('first-step');
+    if (state.bestStreak >= 5) unlockBadge('streak-5');
+    if (state.bestStreak >= 10) unlockBadge('streak-10');
+    if ([1, 2, 3].every(id => masteredIds.includes(id))) unlockBadge('wing-A');
+    if ([4, 5, 6].every(id => masteredIds.includes(id))) unlockBadge('wing-B');
+    if ([7, 8, 9].every(id => masteredIds.includes(id))) unlockBadge('wing-C');
+    if ([10, 11, 12].every(id => masteredIds.includes(id))) unlockBadge('wing-D');
+    if (masteredIds.length === 12) unlockBadge('grand-master');
+    if (state.bestBlitzScore >= 8) unlockBadge('myth-buster');
+  }
+
+  function getRankInfo(xp) {
+    let current = RANKS[0];
+    let next = RANKS[1] || null;
+    for (let i = 0; i < RANKS.length; i++) {
+      if (xp >= RANKS[i].minXp) {
+        current = RANKS[i];
+        next = RANKS[i + 1] || null;
+      }
+    }
+    const pct = next ? Math.min(100, Math.round(((xp - current.minXp) / (next.minXp - current.minXp)) * 100)) : 100;
+    return { current, next, pct };
+  }
+
+  function updateHud() {
+    const { current, pct } = getRankInfo(state.xp);
+    const masteredCount = Object.values(state.sessionProgress).filter(p => p.mastered).length;
+    const sessPct = Math.round((masteredCount / 12) * 100);
+
+    document.getElementById('hud-rank').textContent = current.title;
+    document.getElementById('hud-xp').textContent = `${state.xp} XP`;
+    document.getElementById('hud-xp-bar').style.width = `${pct}%`;
+
+    document.getElementById('hud-sessions').textContent = `${masteredCount} / 12`;
+    document.getElementById('hud-sessions-pct').textContent = `${sessPct}%`;
+    document.getElementById('hud-sessions-bar').style.width = `${sessPct}%`;
+
+    document.getElementById('hud-streak').textContent = `🔥 ${state.streak}`;
+    document.getElementById('hud-best-streak').textContent = state.bestStreak;
+    document.getElementById('hud-badges').textContent = `🏆 ${state.badges.length} / ${BADGES.length}`;
+    document.getElementById('hud-mistakes-badge').textContent = state.mistakes.length;
+    document.getElementById('sound-toggle-btn').textContent = state.soundOn ? '🔊 Ήχος: Ναι' : '🔇 Ήχος: Όχι';
+  }
+
+  // =========================================================================
+  // 4. VIEW 1: CAMPAIGN MAP (12 SESSIONS) + MINI-MISSIONS + GRAND TOUR
+  // =========================================================================
+
+  let activeMission = null; // { mode: 'session'|'grand'|'mistakes', sessionId, title, steps: [], index, score, answered }
+
+  function buildSessionMission(sessionId) {
+    const s = SESSIONS.find(x => x.id === sessionId);
+    const scList = SCENARIOS.filter(x => x.session === sessionId).map(x => ({ kind: 'scenario', data: x }));
+    const blList = BLITZ_ITEMS.filter(x => x.session === sessionId).map(x => ({ kind: 'blitz', data: x }));
+    // Pick both scenarios + 2 blitz items = 4 rich steps per session
+    const steps = [...scList, ...shuffle(blList)];
+    activeMission = {
+      mode: 'session',
+      sessionId,
+      title: `Συνεδρία ${s.id}: ${s.title}`,
+      icon: s.icon,
+      steps,
+      index: 0,
+      score: 0,
+      answered: false
+    };
+    renderView();
+  }
+
+  function buildGrandTourMission() {
+    // 1 random challenge from each of the 12 sessions
+    const steps = SESSIONS.map(s => {
+      const pool = [
+        ...SCENARIOS.filter(x => x.session === s.id).map(x => ({ kind: 'scenario', data: x })),
+        ...BLITZ_ITEMS.filter(x => x.session === s.id).map(x => ({ kind: 'blitz', data: x }))
+      ];
+      return pool[Math.floor(Math.random() * pool.length)];
+    });
+    activeMission = {
+      mode: 'grand',
+      sessionId: null,
+      title: 'Μεγάλη Περιήγηση Β1.1 (12 Συνεδρίες)',
+      icon: '🎓',
+      steps: shuffle(steps),
+      index: 0,
+      score: 0,
+      answered: false
+    };
+    renderView();
+  }
+
+  function buildMistakesMission() {
+    if (state.mistakes.length === 0) {
+      showToast('Δεν έχεις εκκρεμή λάθη προς επανάληψη! Μπράβο!', 'success');
+      return;
+    }
+    const steps = state.mistakes.map(m => {
+      if (m.type === 'scenario') {
+        const found = SCENARIOS.find(x => x.id === m.id);
+        return found ? { kind: 'scenario', data: found } : null;
+      } else {
+        const found = BLITZ_ITEMS.find(x => x.id === m.id);
+        return found ? { kind: 'blitz', data: found } : null;
+      }
+    }).filter(Boolean);
+
+    activeTab = 'map';
+    syncTabs();
+    activeMission = {
+      mode: 'mistakes',
+      sessionId: null,
+      title: `Επανάληψη Λαθών (${steps.length} προκλήσεις)`,
+      icon: '🔁',
+      steps: shuffle(steps),
+      index: 0,
+      score: 0,
+      answered: false
+    };
+    renderView();
+  }
+
+  function renderMapView(container) {
+    if (activeMission) {
+      renderMissionRunner(container);
+      return;
+    }
+
+    const masteredCount = Object.values(state.sessionProgress).filter(p => p.mastered).length;
+    container.innerHTML = `
+      <div class="animate-pop space-y-5">
+        <!-- Hero Mission Banner -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-extrabold">🗺️ Χάρτης Εκπαίδευσης — Οι 12 Συνεδρίες του Β1.1</h2>
+            <p class="text-sm text-[var(--muted-foreground)] mt-1">
+              Επίλεξε οποιαδήποτε Συνεδρία για μια αποστολή 4 προκλήσεων (2 Διδακτικά Σενάρια + 2 Μύθος/Αλήθεια). Με σκορ ≥ 75% (3/4) κερδίζεις τη Σφραγίδα της Συνεδρίας!
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2 shrink-0">
+            <button id="start-grand-tour-btn" class="px-4 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition hover:opacity-95 shadow-sm" style="background-color: var(--primary); color: var(--primary-foreground);">
+              🎲 Μεγάλη Περιήγηση (12/12)
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Thematic Wings -->
+        <div class="space-y-5">
+          ${WINGS.map(wing => {
+            const wingDone = wing.sessions.filter(id => state.sessionProgress[id]?.mastered).length;
+            return `
+              <section class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 md:p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: var(${wing.colorVar});"></span>
+                    <h3 class="text-base font-extrabold">${escapeHtml(wing.title)}</h3>
+                    <span class="text-xs text-[var(--muted-foreground)] font-medium">(${wing.subtitle})</span>
+                  </div>
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${wingDone === 3 ? 'soft-success' : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted-foreground)]'}">
+                    ${wingDone === 3 ? '✅ Ολοκληρωμένη Πτέρυγα' : `${wingDone} / 3 Σφραγίδες`}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  ${wing.sessions.map(sId => {
+                    const s = SESSIONS.find(x => x.id === sId);
+                    const prog = state.sessionProgress[s.id];
+                    const isMastered = prog?.mastered;
+                    const isGold = prog?.gold;
+                    return `
+                      <button data-launch-session="${s.id}" class="option-card text-left p-4 rounded-xl border ${isMastered ? 'soft-success' : 'border-[var(--border)] bg-[var(--background)]'} flex flex-col justify-between gap-3 cursor-pointer">
+                        <div>
+                          <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-lg bg-[var(--card)] border border-[var(--border)]">
+                              Συνεδρία ${s.id}
+                            </span>
+                            <span class="text-lg" aria-hidden="true">${isGold ? '🌟' : isMastered ? '✅' : s.icon}</span>
+                          </div>
+                          <div class="font-bold text-sm leading-snug mb-1.5">${escapeHtml(s.short)}</div>
+                          <div class="text-xs text-[var(--muted-foreground)] leading-relaxed">${escapeHtml(s.keywords)}</div>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-[var(--border)] text-xs font-semibold">
+                          <span class="text-[var(--muted-foreground)]">
+                            ${prog ? `Καλύτερο: ${prog.bestScore}/${prog.total}` : 'Δεν παίχτηκε ακόμα'}
+                          </span>
+                          <span style="color: var(--primary);">${isMastered ? 'Επανάληψη →' : 'Έναρξη →'}</span>
+                        </div>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </section>
+            `;
+          }).join('')}
+        </div>
+
+        ${masteredCount === 12 ? `
+          <div class="rounded-2xl p-5 border soft-success text-center animate-pop">
+            <div class="text-3xl mb-1">👑</div>
+            <h3 class="text-lg font-extrabold">Συγχαρητήρια, Μέντορα Β1.1!</h3>
+            <p class="text-sm text-[var(--muted-foreground)] mt-1">Κατάκτησες όλες τις 12 Συνεδρίες! Δοκίμασε την Αστραπή με χρονόμετρο ή την Αντιστοίχιση για τελειοποίηση.</p>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    container.querySelectorAll('[data-launch-session]').forEach(btn => {
+      btn.addEventListener('click', () => buildSessionMission(Number(btn.dataset.launchSession)));
+    });
+    const grandBtn = container.querySelector('#start-grand-tour-btn');
+    if (grandBtn) grandBtn.addEventListener('click', buildGrandTourMission);
+  }
+
+  function renderMissionRunner(container) {
+    const m = activeMission;
+    if (m.index >= m.steps.length) {
+      // Summary screen
+      const total = m.steps.length;
+      const pct = Math.round((m.score / total) * 100);
+      const passed = pct >= 75;
+      if (m.mode === 'session' && m.sessionId) {
+        const prev = state.sessionProgress[m.sessionId] || { mastered: false, bestScore: 0, total, gold: false };
+        state.sessionProgress[m.sessionId] = {
+          mastered: prev.mastered || passed,
+          bestScore: Math.max(prev.bestScore, m.score),
+          total,
+          gold: prev.gold || (m.score === total)
+        };
+        if (passed && !prev.mastered) {
+          state.xp += 60;
+          playTone('fanfare');
+          showToast(`🎖️ Κατάκτησες τη Σφραγίδα της ${m.sessionId}ης Συνεδρίας (+60 XP)!`, 'success');
+        }
+        checkBadges();
+        saveState();
+        updateHud();
+      } else if (m.mode === 'grand' && passed) {
+        state.xp += 100;
+        playTone('fanfare');
+        saveState();
+        updateHud();
+      }
+
+      container.innerHTML = `
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 md:p-8 max-w-2xl mx-auto text-center animate-pop">
+          <div class="text-5xl mb-3">${m.score === total ? '🌟' : passed ? '🎉' : '📚'}</div>
+          <h2 class="text-2xl font-extrabold mb-1">${escapeHtml(m.title)}</h2>
+          <p class="text-sm text-[var(--muted-foreground)] mb-5">
+            ${m.score === total
+              ? 'Άριστη επίδοση! Απάντησες σωστά σε όλες τις προκλήσεις.'
+              : passed
+                ? 'Εξαιρετικά! Ολοκλήρωσες επιτυχώς την αποστολή.'
+                : 'Χρειάζεσαι τουλάχιστον 75% για τη Σφραγίδα. Δοκίμασε ξανά — τα λάθη αποθηκεύτηκαν για επανάληψη!'}
+          </p>
+          <div class="inline-flex items-center gap-6 px-6 py-4 rounded-2xl bg-[var(--background)] border border-[var(--border)] mb-6">
+            <div>
+              <div class="text-xs text-[var(--muted-foreground)]">Σκορ</div>
+              <div class="text-2xl font-extrabold" style="color: ${passed ? 'var(--success)' : 'var(--warning)'};">${m.score} / ${total}</div>
+            </div>
+            <div class="h-10 w-px bg-[var(--border)]"></div>
+            <div>
+              <div class="text-xs text-[var(--muted-foreground)]">Ποσοστό</div>
+              <div class="text-2xl font-extrabold">${pct}%</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap justify-center gap-3">
+            <button id="mission-back-btn" class="px-5 py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer">
+              ← Επιστροφή στον Χάρτη
+            </button>
+            ${m.mode === 'session' ? `
+              <button id="mission-retry-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+                ↻ Παίξε Ξανά
+              </button>
+              ${m.sessionId < 12 ? `
+                <button id="mission-next-session-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer border soft-success">
+                  Επόμενη Συνεδρία (${m.sessionId + 1}η) →
+                </button>
+              ` : ''}
+            ` : `
+              <button id="mission-retry-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+                🎲 Νέα Περιήγηση
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+
+      container.querySelector('#mission-back-btn').addEventListener('click', () => {
+        activeMission = null;
+        renderView();
+      });
+      const retryBtn = container.querySelector('#mission-retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          if (m.mode === 'session') buildSessionMission(m.sessionId);
+          else if (m.mode === 'grand') buildGrandTourMission();
+          else buildMistakesMission();
+        });
+      }
+      const nextSessBtn = container.querySelector('#mission-next-session-btn');
+      if (nextSessBtn) {
+        nextSessBtn.addEventListener('click', () => buildSessionMission(m.sessionId + 1));
+      }
+      return;
+    }
+
+    const step = m.steps[m.index];
+    const progressPct = Math.round((m.index / m.steps.length) * 100);
+    const sessionInfo = SESSIONS.find(x => x.id === step.data.session);
+
+    // Prepare shuffled options once per step
+    if (step.kind === 'scenario' && !step.shuffledOptions) {
+      step.shuffledOptions = shuffle(step.data.options.map((text, idx) => ({ text, isCorrect: idx === step.data.correct })));
+    }
+
+    container.innerHTML = `
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 md:p-7 max-w-3xl mx-auto animate-pop">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <button id="exit-mission-btn" class="text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer">
+            ← Έξοδος στον Χάρτη
+          </button>
+          <span class="text-xs font-bold px-3 py-1 rounded-full border soft-primary">
+            ${step.kind === 'scenario' ? '🎭 Διδακτικό Σενάριο' : '⚡ Μύθος ή Αλήθεια;'} · Συνεδρία ${sessionInfo.id}
+          </span>
+          <span class="text-xs font-bold text-[var(--muted-foreground)]">Βήμα ${m.index + 1} / ${m.steps.length}</span>
+        </div>
+
+        <div class="w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden mb-5">
+          <div class="h-full rounded-full transition-all duration-300" style="width: ${progressPct}%; background-color: var(--primary);"></div>
+        </div>
+
+        <div class="text-xs font-semibold text-[var(--muted-foreground)] mb-2">
+          ${m.icon} ${escapeHtml(m.title)}
+        </div>
+
+        ${step.kind === 'scenario' ? `
+          <h3 class="text-lg md:text-xl font-bold leading-snug mb-5">${escapeHtml(step.data.prompt)}</h3>
+          <div id="mission-options" class="space-y-3">
+            ${step.shuffledOptions.map((opt, idx) => `
+              <button data-opt-idx="${idx}" class="option-card w-full text-left p-4 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm leading-relaxed font-medium cursor-pointer flex items-start gap-3">
+                <span class="w-6 h-6 rounded-lg bg-[var(--card)] border border-[var(--border)] text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span>
+                <span>${escapeHtml(opt.text)}</span>
+              </button>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="p-5 rounded-2xl bg-[var(--background)] border border-[var(--border)] mb-5">
+            <div class="text-xs uppercase tracking-wider font-bold text-[var(--muted-foreground)] mb-2">Εκτίμησε τη δήλωση:</div>
+            <p class="text-lg md:text-xl font-bold leading-snug">«${escapeHtml(step.data.statement)}»</p>
+          </div>
+          <div id="mission-options" class="grid grid-cols-2 gap-3.5">
+            <button data-tf="true" class="option-card p-4 rounded-xl border border-[var(--border)] bg-[var(--background)] font-extrabold text-base cursor-pointer text-center">
+              ✅ ΑΛΗΘΕΙΑ
+            </button>
+            <button data-tf="false" class="option-card p-4 rounded-xl border border-[var(--border)] bg-[var(--background)] font-extrabold text-base cursor-pointer text-center">
+              ❌ ΜΥΘΟΣ
+            </button>
+          </div>
+        `}
+
+        <div id="mission-feedback" class="hidden mt-5"></div>
+      </div>
+    `;
+
+    container.querySelector('#exit-mission-btn').addEventListener('click', () => {
+      activeMission = null;
+      renderView();
+    });
+
+    const handleChoice = (isCorrect, clickedBtn) => {
+      if (m.answered) return;
+      m.answered = true;
+      const gained = awardAnswer(isCorrect, { type: step.kind, id: step.data.id }, 30);
+      if (isCorrect) m.score += 1;
+
+      const allBtns = container.querySelectorAll('#mission-options button');
+      allBtns.forEach(b => {
+        b.disabled = true;
+        b.classList.remove('cursor-pointer');
+        if (step.kind === 'scenario') {
+          const i = Number(b.dataset.optIdx);
+          if (step.shuffledOptions[i].isCorrect) {
+            b.classList.add('soft-success');
+          } else if (b === clickedBtn && !isCorrect) {
+            b.classList.add('soft-error', 'animate-shake');
+          } else {
+            b.style.opacity = '0.55';
+          }
+        } else {
+          const val = b.dataset.tf === 'true';
+          if (val === step.data.isTrue) {
+            b.classList.add('soft-success');
+          } else if (b === clickedBtn && !isCorrect) {
+            b.classList.add('soft-error', 'animate-shake');
+          } else {
+            b.style.opacity = '0.55';
+          }
+        }
+      });
+
+      const fb = container.querySelector('#mission-feedback');
+      fb.className = `mt-5 p-4 rounded-xl border animate-pop ${isCorrect ? 'soft-success' : 'soft-error'}`;
+      fb.innerHTML = `
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <span class="font-extrabold text-sm">${isCorrect ? `✅ Σωστό! +${gained} XP` : '❌ Όχι ακριβώς — προστέθηκε στην Επανάληψη Λαθών'}</span>
+          <span class="text-xs font-semibold text-[var(--muted-foreground)]">Συνεδρία ${step.data.session}</span>
+        </div>
+        <p class="text-sm leading-relaxed mb-4">${escapeHtml(step.data.explanation)}</p>
+        <div class="flex justify-end">
+          <button id="mission-next-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+            ${m.index + 1 < m.steps.length ? 'Επόμενη Πρόκληση →' : 'Ολοκλήρωση Αποστολής ✓'}
+          </button>
+        </div>
+      `;
+      container.querySelector('#mission-next-btn').addEventListener('click', () => {
+        m.index += 1;
+        m.answered = false;
+        renderView();
+      });
+    };
+
+    if (step.kind === 'scenario') {
+      container.querySelectorAll('[data-opt-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.optIdx);
+          handleChoice(step.shuffledOptions[idx].isCorrect, btn);
+        });
+      });
+    } else {
+      container.querySelectorAll('[data-tf]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.dataset.tf === 'true';
+          handleChoice(val === step.data.isTrue, btn);
+        });
+      });
+    }
+  }
+
+  // =========================================================================
+  // 5. VIEW 2: CLASSROOM DIRECTOR LAB (SCENARIOS FILTERABLE BY SESSION)
+  // =========================================================================
+
+  let labState = {
+    filterSession: 'all',
+    queue: [],
+    index: 0,
+    score: 0,
+    answered: false,
+    shuffledOptions: null
+  };
+
+  function initLabQueue(filterVal) {
+    labState.filterSession = filterVal;
+    const list = filterVal === 'all' ? SCENARIOS : SCENARIOS.filter(s => s.session === Number(filterVal));
+    labState.queue = shuffle(list);
+    labState.index = 0;
+    labState.score = 0;
+    labState.answered = false;
+    labState.shuffledOptions = null;
+  }
+
+  function renderScenariosView(container) {
+    if (labState.queue.length === 0) initLabQueue(labState.filterSession);
+
+    const finished = labState.index >= labState.queue.length;
+    const current = finished ? null : labState.queue[labState.index];
+    if (current && !labState.shuffledOptions) {
+      labState.shuffledOptions = shuffle(current.options.map((text, idx) => ({ text, isCorrect: idx === current.correct })));
+    }
+
+    container.innerHTML = `
+      <div class="space-y-4 animate-pop">
+        <!-- Control bar -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-extrabold">🎭 Εργαστήριο «Σκηνοθέτης της Τάξης»</h2>
+            <p class="text-xs text-[var(--muted-foreground)] mt-0.5">24 ρεαλιστικά διλήμματα διδακτικής αναπλαισίωσης &amp; παιδαγωγικού σχεδιασμού από όλες τις Συνεδρίες.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="lab-filter" class="text-xs font-semibold text-[var(--muted-foreground)]">Συνεδρία:</label>
+            <select id="lab-filter" class="px-3 py-2 rounded-xl text-xs font-semibold bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)] cursor-pointer">
+              <option value="all" ${labState.filterSession === 'all' ? 'selected' : ''}>Όλες οι 12 Συνεδρίες (24)</option>
+              ${SESSIONS.map(s => `<option value="${s.id}" ${String(labState.filterSession) === String(s.id) ? 'selected' : ''}>${s.id}η — ${escapeHtml(s.short)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        ${finished ? `
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 max-w-2xl mx-auto text-center animate-pop">
+            <div class="text-5xl mb-3">🎬</div>
+            <h3 class="text-xl font-extrabold mb-1">Τέλος Γύρου Εργαστηρίου!</h3>
+            <p class="text-sm text-[var(--muted-foreground)] mb-4">Σωστές σκηνοθετικές αποφάσεις: <strong>${labState.score} / ${labState.queue.length}</strong></p>
+            <button id="lab-restart-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+              ↻ Νέος Ανακατεμένος Γύρος
+            </button>
+          </div>
+        ` : `
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 md:p-7 max-w-3xl mx-auto">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-full border soft-primary">Συνεδρία ${current.session}</span>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--background)] border border-[var(--border)] text-[var(--muted-foreground)]">${escapeHtml(current.tag)}</span>
+              </div>
+              <span class="text-xs font-bold text-[var(--muted-foreground)]">Σενάριο ${labState.index + 1} / ${labState.queue.length} · Σκορ: ${labState.score}</span>
+            </div>
+
+            <h3 class="text-lg font-bold leading-snug mb-5">${escapeHtml(current.prompt)}</h3>
+
+            <div id="lab-options" class="space-y-3">
+              ${labState.shuffledOptions.map((opt, idx) => `
+                <button data-lab-opt="${idx}" class="option-card w-full text-left p-4 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm font-medium leading-relaxed cursor-pointer flex items-start gap-3">
+                  <span class="w-6 h-6 rounded-lg bg-[var(--card)] border border-[var(--border)] text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span>
+                  <span>${escapeHtml(opt.text)}</span>
+                </button>
+              `).join('')}
+            </div>
+
+            <div id="lab-feedback" class="hidden mt-5"></div>
+          </div>
+        `}
+      </div>
+    `;
+
+    container.querySelector('#lab-filter').addEventListener('change', (e) => {
+      initLabQueue(e.target.value);
+      renderView();
+    });
+
+    if (finished) {
+      container.querySelector('#lab-restart-btn').addEventListener('click', () => {
+        initLabQueue(labState.filterSession);
+        renderView();
+      });
+      return;
+    }
+
+    container.querySelectorAll('[data-lab-opt]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (labState.answered) return;
+        labState.answered = true;
+        const idx = Number(btn.dataset.labOpt);
+        const isCorrect = labState.shuffledOptions[idx].isCorrect;
+        const gained = awardAnswer(isCorrect, { type: 'scenario', id: current.id }, 30);
+        if (isCorrect) labState.score += 1;
+
+        container.querySelectorAll('[data-lab-opt]').forEach(b => {
+          b.disabled = true;
+          b.classList.remove('cursor-pointer');
+          const i = Number(b.dataset.labOpt);
+          if (labState.shuffledOptions[i].isCorrect) b.classList.add('soft-success');
+          else if (b === btn && !isCorrect) b.classList.add('soft-error', 'animate-shake');
+          else b.style.opacity = '0.55';
+        });
+
+        const fb = container.querySelector('#lab-feedback');
+        fb.className = `mt-5 p-4 rounded-xl border animate-pop ${isCorrect ? 'soft-success' : 'soft-error'}`;
+        fb.innerHTML = `
+          <div class="font-extrabold text-sm mb-1">${isCorrect ? `✅ Εξαιρετική απόφαση! +${gained} XP` : '❌ Διαφορετική παιδαγωγική επιλογή — προστέθηκε στα Λάθη'}</div>
+          <p class="text-sm leading-relaxed mb-4">${escapeHtml(current.explanation)}</p>
+          <div class="flex justify-end">
+            <button id="lab-next-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+              ${labState.index + 1 < labState.queue.length ? 'Επόμενο Σενάριο →' : 'Προβολή Αποτελεσμάτων ✓'}
+            </button>
+          </div>
+        `;
+        container.querySelector('#lab-next-btn').addEventListener('click', () => {
+          labState.index += 1;
+          labState.answered = false;
+          labState.shuffledOptions = null;
+          renderView();
+        });
+      });
+    });
+  }
+
+  // =========================================================================
+  // 6. VIEW 3: SPEED MATCHING GAME (TERMS, THEORISTS & TOOLS)
+  // =========================================================================
+
+  let matchState = {
+    packId: 'pack-1',
+    leftItems: [],
+    rightItems: [],
+    selectedLeft: null,
+    selectedRight: null,
+    matchedIds: [],
+    mistakes: 0,
+    moves: 0,
+    startedAt: null,
+    elapsedSec: 0,
+    lastFeedback: ''
+  };
+
+  function initMatchGame(packId) {
+    matchState.packId = packId;
+    let sourcePairs;
+    if (packId === 'mix') {
+      const all = MATCHING_PACKS.flatMap(p => p.pairs);
+      sourcePairs = shuffle(all).slice(0, 6);
+    } else {
+      const pack = MATCHING_PACKS.find(p => p.id === packId) || MATCHING_PACKS[0];
+      sourcePairs = pack.pairs.slice();
+    }
+    matchState.leftItems = shuffle(sourcePairs.map(p => ({ id: p.id, text: p.left, session: p.session })));
+    matchState.rightItems = shuffle(sourcePairs.map(p => ({ id: p.id, text: p.right, session: p.session })));
+    matchState.selectedLeft = null;
+    matchState.selectedRight = null;
+    matchState.matchedIds = [];
+    matchState.mistakes = 0;
+    matchState.moves = 0;
+    matchState.startedAt = Date.now();
+    matchState.elapsedSec = 0;
+    matchState.lastFeedback = 'Επίλεξε έναν όρο/εργαλείο αριστερά και ταίριαξέ τον με την περιγραφή δεξιά!';
+  }
+
+  function renderMatchingView(container) {
+    if (matchState.leftItems.length === 0) initMatchGame(matchState.packId);
+    const totalPairs = matchState.leftItems.length;
+    const isComplete = matchState.matchedIds.length === totalPairs;
+
+    container.innerHTML = `
+      <div class="space-y-4 animate-pop">
+        <!-- Pack selector -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+            <div>
+              <h2 class="text-base font-extrabold">🧩 Ταίριαξε Όρους, Θεωρητικούς &amp; Εργαλεία</h2>
+              <p class="text-xs text-[var(--muted-foreground)] mt-0.5">Σύνδεσε τα ζευγάρια με τα λιγότερα δυνατά λάθη. Χωρίς λάθη ξεκλειδώνεις το τρόπαιο «Άρχοντας Αντιστοίχισης»!</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-bold">
+              <span class="px-2.5 py-1 rounded-lg bg-[var(--background)] border border-[var(--border)]">Ζευγάρια: ${matchState.matchedIds.length}/${totalPairs}</span>
+              <span class="px-2.5 py-1 rounded-lg bg-[var(--background)] border border-[var(--border)]">Λάθη: ${matchState.mistakes}</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${MATCHING_PACKS.map(p => `
+              <button data-match-pack="${p.id}" class="px-3 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition ${matchState.packId === p.id ? 'soft-primary font-bold' : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'}">
+                ${p.icon} ${escapeHtml(p.title)} ${state.completedPacks.includes(p.id) ? '✓' : ''}
+              </button>
+            `).join('')}
+            <button data-match-pack="mix" class="px-3 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition ${matchState.packId === 'mix' ? 'soft-primary font-bold' : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'}">
+              🎲 Τυχαίο Μείγμα (Όλες οι 12 Συνεδρίες)
+            </button>
+          </div>
+        </div>
+
+        <!-- Feedback strip -->
+        <div id="match-status-bar" class="px-4 py-2.5 rounded-xl border text-xs font-semibold ${isComplete ? 'soft-success' : 'border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]'}">
+          ${escapeHtml(matchState.lastFeedback)}
+        </div>
+
+        ${isComplete ? `
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-7 text-center animate-pop max-w-xl mx-auto">
+            <div class="text-5xl mb-2">${matchState.mistakes === 0 ? '🏆' : '🎉'}</div>
+            <h3 class="text-xl font-extrabold mb-1">${matchState.mistakes === 0 ? 'Άψογη Αντιστοίχιση — Μηδέν Λάθη!' : 'Όλα τα ζευγάρια ταιριάστηκαν!'}</h3>
+            <p class="text-sm text-[var(--muted-foreground)] mb-5">
+              Κινήσεις: <strong>${matchState.moves}</strong> · Λάθη: <strong>${matchState.mistakes}</strong> · Χρόνος: <strong>${matchState.elapsedSec}s</strong>
+            </p>
+            <div class="flex flex-wrap justify-center gap-2.5">
+              <button id="match-replay-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+                ↻ Παίξε Ξανά
+              </button>
+              <button id="match-mix-btn" class="px-5 py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer">
+                🎲 Τυχαίο Μείγμα
+              </button>
+            </div>
+          </div>
+        ` : `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Left column -->
+            <div class="space-y-2.5">
+              <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] px-1">Όρος / Πλατφόρμα / Θεωρητικός</div>
+              ${matchState.leftItems.map(item => {
+                const matched = matchState.matchedIds.includes(item.id);
+                const selected = matchState.selectedLeft === item.id;
+                return `
+                  <button data-left-id="${item.id}" ${matched ? 'disabled' : ''} class="w-full text-left p-3.5 rounded-xl border text-sm font-bold transition flex items-center justify-between gap-2 ${
+                    matched ? 'soft-success opacity-75' :
+                    selected ? 'soft-primary ring-2 ring-[var(--primary)] cursor-pointer' :
+                    'option-card border-[var(--border)] bg-[var(--card)] cursor-pointer'
+                  }">
+                    <span>${escapeHtml(item.text)}</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-[var(--background)] border border-[var(--border)] text-[var(--muted-foreground)] shrink-0">
+                      ${matched ? '✅' : `Συν. ${item.session}`}
+                    </span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Right column -->
+            <div class="space-y-2.5">
+              <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] px-1">Περιγραφή / Έννοια</div>
+              ${matchState.rightItems.map(item => {
+                const matched = matchState.matchedIds.includes(item.id);
+                const selected = matchState.selectedRight === item.id;
+                return `
+                  <button data-right-id="${item.id}" ${matched ? 'disabled' : ''} class="w-full text-left p-3.5 rounded-xl border text-sm font-medium leading-snug transition ${
+                    matched ? 'soft-success opacity-75' :
+                    selected ? 'soft-primary ring-2 ring-[var(--primary)] cursor-pointer' :
+                    'option-card border-[var(--border)] bg-[var(--card)] cursor-pointer'
+                  }">
+                    ${escapeHtml(item.text)}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `}
+      </div>
+    `;
+
+    container.querySelectorAll('[data-match-pack]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        initMatchGame(btn.dataset.matchPack);
+        renderView();
+      });
+    });
+
+    if (isComplete) {
+      container.querySelector('#match-replay-btn').addEventListener('click', () => {
+        initMatchGame(matchState.packId);
+        renderView();
+      });
+      container.querySelector('#match-mix-btn').addEventListener('click', () => {
+        initMatchGame('mix');
+        renderView();
+      });
+      return;
+    }
+
+    const tryMatch = () => {
+      if (!matchState.selectedLeft || !matchState.selectedRight) return;
+      matchState.moves += 1;
+      if (matchState.selectedLeft === matchState.selectedRight) {
+        const matchedObj = matchState.leftItems.find(x => x.id === matchState.selectedLeft);
+        matchState.matchedIds.push(matchState.selectedLeft);
+        matchState.selectedLeft = null;
+        matchState.selectedRight = null;
+        const gained = awardAnswer(true, null, 20);
+        matchState.lastFeedback = `✅ Σωστό ταίριασμα: «${matchedObj.text}» (+${gained} XP)`;
+
+        if (matchState.matchedIds.length === matchState.leftItems.length) {
+          matchState.elapsedSec = Math.max(1, Math.round((Date.now() - matchState.startedAt) / 1000));
+          if (matchState.packId !== 'mix' && !state.completedPacks.includes(matchState.packId)) {
+            state.completedPacks.push(matchState.packId);
+          }
+          if (matchState.mistakes === 0) {
+            unlockBadge('pair-master');
+          }
+          state.xp += 40;
+          playTone('fanfare');
+          saveState();
+          updateHud();
+        }
+        renderView();
+      } else {
+        matchState.mistakes += 1;
+        awardAnswer(false, null, 0);
+        matchState.lastFeedback = '❌ Δεν ταιριάζουν αυτά τα δύο — δοκίμασε άλλο συνδυασμό!';
+        const lBtn = container.querySelector(`[data-left-id="${matchState.selectedLeft}"]`);
+        const rBtn = container.querySelector(`[data-right-id="${matchState.selectedRight}"]`);
+        if (lBtn) lBtn.classList.add('soft-error', 'animate-shake');
+        if (rBtn) rBtn.classList.add('soft-error', 'animate-shake');
+        matchState.selectedLeft = null;
+        matchState.selectedRight = null;
+        setTimeout(() => renderView(), 420);
+      }
+    };
+
+    container.querySelectorAll('[data-left-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        matchState.selectedLeft = matchState.selectedLeft === btn.dataset.leftId ? null : btn.dataset.leftId;
+        if (matchState.selectedLeft && matchState.selectedRight) tryMatch();
+        else renderView();
+      });
+    });
+
+    container.querySelectorAll('[data-right-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        matchState.selectedRight = matchState.selectedRight === btn.dataset.rightId ? null : btn.dataset.rightId;
+        if (matchState.selectedLeft && matchState.selectedRight) tryMatch();
+        else renderView();
+      });
+    });
+  }
+
+  // =========================================================================
+  // 7. VIEW 4: LIGHTNING BLITZ (MYTH OR TRUTH WITH 3 HEARTS & OPTIONAL TIMER)
+  // =========================================================================
+
+  let blitzState = {
+    phase: 'intro', // 'intro' | 'playing' | 'over'
+    useTimer: false,
+    queue: [],
+    index: 0,
+    hearts: 3,
+    score: 0,
+    answered: false,
+    timeLeft: 15,
+    timerHandle: null
+  };
+
+  function clearBlitzTimer() {
+    if (blitzState.timerHandle) {
+      clearInterval(blitzState.timerHandle);
+      blitzState.timerHandle = null;
+    }
+  }
+
+  function startBlitz() {
+    clearBlitzTimer();
+    blitzState.phase = 'playing';
+    blitzState.queue = shuffle(BLITZ_ITEMS);
+    blitzState.index = 0;
+    blitzState.hearts = 3;
+    blitzState.score = 0;
+    blitzState.answered = false;
+    blitzState.timeLeft = 15;
+    renderView();
+  }
+
+  function renderBlitzView(container) {
+    clearBlitzTimer();
+
+    if (blitzState.phase === 'intro') {
+      container.innerHTML = `
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 md:p-8 max-w-2xl mx-auto text-center animate-pop">
+          <div class="text-5xl mb-3">⚡</div>
+          <h2 class="text-2xl font-extrabold mb-2">Αστραπή: Μύθος ή Αλήθεια;</h2>
+          <p class="text-sm text-[var(--muted-foreground)] max-w-lg mx-auto mb-5 leading-relaxed">
+            24 αιχμηρές δηλώσεις από όλες τις 12 Συνεδρίες! Έχεις <strong>3 καρδιές (❤️❤️❤️)</strong>. Κάθε σωστή απάντηση δίνει XP και ανεβάζει το σερί σου. Πέτυχε 8+ σωστές για το τρόπαιο «Κυνηγός Μύθων»!
+          </p>
+
+          <div class="inline-flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--background)] border border-[var(--border)] mb-6">
+            <input id="blitz-timer-chk" type="checkbox" ${blitzState.useTimer ? 'checked' : ''} class="w-4 h-4 cursor-pointer accent-[var(--primary)]" />
+            <label for="blitz-timer-chk" class="text-sm font-semibold cursor-pointer">
+              ⏱️ Λειτουργία Χρονομέτρου (15 δευτερόλεπτα ανά κάρτα)
+            </label>
+          </div>
+
+          <div class="text-xs text-[var(--muted-foreground)] mb-5">
+            Καλύτερο ρεκόρ σου: <strong class="text-[var(--foreground)]">${state.bestBlitzScore} / ${BLITZ_ITEMS.length}</strong> · Συντομεύσεις: <kbd class="px-1.5 py-0.5 rounded bg-[var(--secondary)] border border-[var(--border)]">1</kbd> Αλήθεια, <kbd class="px-1.5 py-0.5 rounded bg-[var(--secondary)] border border-[var(--border)]">2</kbd> Μύθος
+          </div>
+
+          <button id="blitz-start-btn" class="px-6 py-3 rounded-xl text-base font-extrabold cursor-pointer shadow-sm" style="background-color: var(--primary); color: var(--primary-foreground);">
+            ⚡ Έναρξη Πρόκλησης
+          </button>
+        </div>
+      `;
+
+      container.querySelector('#blitz-timer-chk').addEventListener('change', (e) => {
+        blitzState.useTimer = e.target.checked;
+      });
+      container.querySelector('#blitz-start-btn').addEventListener('click', startBlitz);
+      return;
+    }
+
+    if (blitzState.phase === 'over' || blitzState.index >= blitzState.queue.length || blitzState.hearts <= 0) {
+      blitzState.phase = 'over';
+      const isNewRecord = blitzState.score > state.bestBlitzScore;
+      if (isNewRecord) {
+        state.bestBlitzScore = blitzState.score;
+        checkBadges();
+        saveState();
+        updateHud();
+      }
+      const survivedAll = blitzState.hearts > 0 && blitzState.index >= blitzState.queue.length;
+      if (survivedAll) playTone('fanfare');
+
+      container.innerHTML = `
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 md:p-8 max-w-xl mx-auto text-center animate-pop">
+          <div class="text-5xl mb-3">${survivedAll ? '🏆' : blitzState.score >= 8 ? '🎯' : '⚡'}</div>
+          <h2 class="text-2xl font-extrabold mb-1">${survivedAll ? 'Καθάρισες όλη την τράπουλα!' : 'Τέλος Αστραπής!'}</h2>
+          <p class="text-sm text-[var(--muted-foreground)] mb-5">
+            ${isNewRecord ? '🎉 Νέο προσωπικό ρεκόρ! ' : ''}Σωστές απαντήσεις: <strong>${blitzState.score}</strong> · Ρεκόρ: <strong>${state.bestBlitzScore}</strong>
+          </p>
+          <div class="flex flex-wrap justify-center gap-3">
+            <button id="blitz-retry-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+              ↻ Νέα Προσπάθεια
+            </button>
+            <button id="blitz-settings-btn" class="px-5 py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer">
+              Ρυθμίσεις
+            </button>
+          </div>
+        </div>
+      `;
+      container.querySelector('#blitz-retry-btn').addEventListener('click', startBlitz);
+      container.querySelector('#blitz-settings-btn').addEventListener('click', () => {
+        blitzState.phase = 'intro';
+        renderView();
+      });
+      return;
+    }
+
+    const item = blitzState.queue[blitzState.index];
+    const heartsHtml = Array.from({ length: 3 }, (_, i) => i < blitzState.hearts ? '❤️' : '🖤').join(' ');
+
+    container.innerHTML = `
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 md:p-7 max-w-2xl mx-auto animate-pop">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div class="text-base" aria-label="Ζωές">${heartsHtml}</div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full border soft-primary">Συνεδρία ${item.session}</span>
+          <div class="text-xs font-bold">
+            Σκορ: <span style="color: var(--success);">${blitzState.score}</span> · Κάρτα ${blitzState.index + 1}/${blitzState.queue.length}
+          </div>
+        </div>
+
+        ${blitzState.useTimer ? `
+          <div class="mb-4">
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-[var(--muted-foreground)]">Χρόνος</span>
+              <span id="blitz-timer-text">${blitzState.timeLeft}s</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-[var(--secondary)] overflow-hidden">
+              <div id="blitz-timer-bar" class="h-full rounded-full transition-all duration-1000" style="width: ${(blitzState.timeLeft / 15) * 100}%; background-color: var(--warning);"></div>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="p-6 rounded-2xl bg-[var(--background)] border border-[var(--border)] mb-5 min-h-[130px] flex items-center justify-center text-center">
+          <p class="text-lg md:text-xl font-bold leading-snug">«${escapeHtml(item.statement)}»</p>
+        </div>
+
+        <div id="blitz-buttons" class="grid grid-cols-2 gap-3.5">
+          <button data-blitz-choice="true" class="option-card p-4 rounded-xl border border-[var(--border)] bg-[var(--background)] font-extrabold text-base cursor-pointer">
+            ✅ ΑΛΗΘΕΙΑ <span class="text-xs font-normal text-[var(--muted-foreground)] block mt-0.5">[Πλήκτρο 1]</span>
+          </button>
+          <button data-blitz-choice="false" class="option-card p-4 rounded-xl border border-[var(--border)] bg-[var(--background)] font-extrabold text-base cursor-pointer">
+            ❌ ΜΥΘΟΣ <span class="text-xs font-normal text-[var(--muted-foreground)] block mt-0.5">[Πλήκτρο 2]</span>
+          </button>
+        </div>
+
+        <div id="blitz-feedback" class="hidden mt-5"></div>
+      </div>
+    `;
+
+    const evaluateBlitz = (chosenVal, timedOut = false) => {
+      if (blitzState.answered) return;
+      blitzState.answered = true;
+      clearBlitzTimer();
+
+      const isCorrect = !timedOut && (chosenVal === item.isTrue);
+      const gained = awardAnswer(isCorrect, { type: 'blitz', id: item.id }, 25);
+      if (isCorrect) {
+        blitzState.score += 1;
+        if (blitzState.score > state.bestBlitzScore) {
+          state.bestBlitzScore = blitzState.score;
+          checkBadges();
+          saveState();
+          updateHud();
+        }
+      } else {
+        blitzState.hearts -= 1;
+      }
+
+      container.querySelectorAll('[data-blitz-choice]').forEach(b => {
+        b.disabled = true;
+        b.classList.remove('cursor-pointer');
+        const val = b.dataset.blitzChoice === 'true';
+        if (val === item.isTrue) b.classList.add('soft-success');
+        else if (!timedOut && val === chosenVal && !isCorrect) b.classList.add('soft-error', 'animate-shake');
+        else b.style.opacity = '0.5';
+      });
+
+      const fb = container.querySelector('#blitz-feedback');
+      fb.className = `mt-5 p-4 rounded-xl border animate-pop ${isCorrect ? 'soft-success' : 'soft-error'}`;
+      fb.innerHTML = `
+        <div class="font-extrabold text-sm mb-1">
+          ${timedOut ? '⏱️ Έληξε ο χρόνος! (-1 ❤️)' : isCorrect ? `✅ Σωστό! +${gained} XP` : '❌ Λάθος! (-1 ❤️ · προστέθηκε στα Λάθη)'}
+        </div>
+        <p class="text-sm leading-relaxed mb-4">${escapeHtml(item.explanation)}</p>
+        <div class="flex justify-end">
+          <button id="blitz-next-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+            ${blitzState.hearts <= 0 || blitzState.index + 1 >= blitzState.queue.length ? 'Αποτελέσματα →' : 'Επόμενη Κάρτα [Enter] →'}
+          </button>
+        </div>
+      `;
+      container.querySelector('#blitz-next-btn').addEventListener('click', () => {
+        blitzState.index += 1;
+        blitzState.answered = false;
+        blitzState.timeLeft = 15;
+        if (blitzState.hearts <= 0 || blitzState.index >= blitzState.queue.length) blitzState.phase = 'over';
+        renderView();
+      });
+    };
+
+    container.querySelectorAll('[data-blitz-choice]').forEach(btn => {
+      btn.addEventListener('click', () => evaluateBlitz(btn.dataset.blitzChoice === 'true', false));
+    });
+
+    // Attach optional countdown
+    if (blitzState.useTimer && !blitzState.answered) {
+      blitzState.timerHandle = setInterval(() => {
+        blitzState.timeLeft -= 1;
+        const txt = document.getElementById('blitz-timer-text');
+        const bar = document.getElementById('blitz-timer-bar');
+        if (txt) txt.textContent = `${Math.max(0, blitzState.timeLeft)}s`;
+        if (bar) bar.style.width = `${Math.max(0, (blitzState.timeLeft / 15) * 100)}%`;
+        if (blitzState.timeLeft <= 0) {
+          evaluateBlitz(null, true);
+        }
+      }, 1000);
+    }
+
+    // Store quick keyboard handler ref
+    container._blitzEval = evaluateBlitz;
+  }
+
+  // =========================================================================
+  // 8. VIEW 5: STUDY FLASHCARDS, MISTAKE QUEUE & TROPHY CABINET
+  // =========================================================================
+
+  let studyState = {
+    filterSession: 'all',
+    searchQuery: '',
+    flippedIds: new Set()
+  };
+
+  function renderStudyView(container) {
+    const filteredCards = FLASHCARDS.filter(c => {
+      const okSession = studyState.filterSession === 'all' || c.session === Number(studyState.filterSession);
+      const q = studyState.searchQuery.trim().toLowerCase();
+      const okSearch = !q || c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q);
+      return okSession && okSearch;
+    });
+
+    container.innerHTML = `
+      <div class="space-y-6 animate-pop">
+        <!-- Trophy Cabinet -->
+        <section class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 class="text-base font-extrabold">🏆 Συλλογή Τροπαίων (${state.badges.length} / ${BADGES.length})</h2>
+              <p class="text-xs text-[var(--muted-foreground)] mt-0.5">Ξεκλείδωσε όλα τα τρόπαια κατακτώντας τις 4 Πτέρυγες και τις ειδικές προκλήσεις.</p>
+            </div>
+            ${state.mistakes.length > 0 ? `
+              <button id="study-mistakes-btn" class="px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer" style="background-color: var(--primary); color: var(--primary-foreground);">
+                🔁 Εξάσκηση στα ${state.mistakes.length} Λάθη μου
+              </button>
+            ` : `
+              <span class="text-xs font-semibold px-3 py-1.5 rounded-xl border soft-success">✨ Κανένα εκκρεμές λάθος!</span>
+            `}
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            ${BADGES.map(b => {
+              const unlocked = state.badges.includes(b.id);
+              return `
+                <div class="p-3 rounded-xl border text-center transition ${unlocked ? 'soft-warning' : 'border-[var(--border)] bg-[var(--background)] opacity-55'}">
+                  <div class="text-2xl mb-1">${unlocked ? b.icon : '🔒'}</div>
+                  <div class="text-xs font-extrabold leading-tight mb-1">${escapeHtml(b.title)}</div>
+                  <div class="text-xs text-[var(--muted-foreground)] leading-snug">${escapeHtml(b.desc)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </section>
+
+        <!-- Flashcards Study Deck -->
+        <section class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="text-base font-extrabold">📖 Κάρτες Μελέτης (24 Κάρτες · 12 Συνεδρίες)</h2>
+              <p class="text-xs text-[var(--muted-foreground)] mt-0.5">Πάτησε πάνω σε οποιαδήποτε κάρτα για να γυρίσει και να δεις τη συνοπτική απάντηση.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="fc-search" type="search" value="${escapeHtml(studyState.searchQuery)}" placeholder="Αναζήτηση όρου (π.χ. FLIP, CC, VR)..." class="px-3 py-2 rounded-xl text-xs bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)] w-52" />
+              <select id="fc-filter" class="px-3 py-2 rounded-xl text-xs font-semibold bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)] cursor-pointer">
+                <option value="all" ${studyState.filterSession === 'all' ? 'selected' : ''}>Όλες οι Συνεδρίες</option>
+                ${SESSIONS.map(s => `<option value="${s.id}" ${String(studyState.filterSession) === String(s.id) ? 'selected' : ''}>${s.id}η — ${escapeHtml(s.short)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          ${filteredCards.length === 0 ? `
+            <div class="text-center py-10 text-sm text-[var(--muted-foreground)]">Δεν βρέθηκαν κάρτες με αυτά τα κριτήρια αναζήτησης.</div>
+          ` : `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${filteredCards.map(c => {
+                const flipped = studyState.flippedIds.has(c.id);
+                const sInfo = SESSIONS.find(x => x.id === c.session);
+                return `
+                  <div class="flip-perspective">
+                    <button data-flip-id="${c.id}" class="w-full text-left cursor-pointer block bg-transparent border-0 p-0">
+                      <div class="flip-inner ${flipped ? 'is-flipped' : ''}">
+                        <!-- Front -->
+                        <div class="flip-face p-4 rounded-2xl border border-[var(--border)] bg-[var(--background)] hover:border-[var(--primary)] transition">
+                          <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-lg border soft-primary">Συνεδρία ${c.session}</span>
+                            <span class="text-xs text-[var(--muted-foreground)]">${sInfo.icon} Ερώτηση</span>
+                          </div>
+                          <div class="text-sm font-bold leading-snug my-3">${escapeHtml(c.front)}</div>
+                          <div class="text-xs font-semibold" style="color: var(--primary);">Πάτησε για απάντηση ↻</div>
+                        </div>
+                        <!-- Back -->
+                        <div class="flip-face flip-back p-4 rounded-2xl border soft-success">
+                          <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold">Συνεδρία ${c.session} · Απάντηση</span>
+                            <span class="text-xs">✓</span>
+                          </div>
+                          <div class="text-xs leading-relaxed my-2 text-[var(--foreground)] font-medium">${escapeHtml(c.back)}</div>
+                          <div class="text-xs text-[var(--muted-foreground)]">Πάτησε για επιστροφή ↺</div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </section>
+      </div>
+    `;
+
+    const mistBtn = container.querySelector('#study-mistakes-btn');
+    if (mistBtn) mistBtn.addEventListener('click', buildMistakesMission);
+
+    container.querySelector('#fc-filter').addEventListener('change', (e) => {
+      studyState.filterSession = e.target.value;
+      renderView();
+    });
+
+    const searchInput = container.querySelector('#fc-search');
+    searchInput.addEventListener('input', (e) => {
+      studyState.searchQuery = e.target.value;
+      const pos = e.target.selectionStart;
+      renderView();
+      const refreshed = document.getElementById('fc-search');
+      if (refreshed) {
+        refreshed.focus();
+        refreshed.setSelectionRange(pos, pos);
+      }
+    });
+
+    container.querySelectorAll('[data-flip-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.flipId;
+        if (studyState.flippedIds.has(id)) studyState.flippedIds.delete(id);
+        else studyState.flippedIds.add(id);
+        btn.querySelector('.flip-inner').classList.toggle('is-flipped');
+      });
+    });
+  }
+
+  // =========================================================================
+  // 9. ROUTER, GLOBAL CONTROLS & KEYBOARD SHORTCUTS
+  // =========================================================================
+
+  function syncTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.setAttribute('aria-selected', btn.dataset.tab === activeTab ? 'true' : 'false');
+    });
+  }
+
+  function renderView() {
+    clearBlitzTimer();
+    const container = document.getElementById('app-view');
+    if (activeTab === 'map') renderMapView(container);
+    else if (activeTab === 'scenarios') renderScenariosView(container);
+    else if (activeTab === 'matching') renderMatchingView(container);
+    else if (activeTab === 'blitz') renderBlitzView(container);
+    else if (activeTab === 'study') renderStudyView(container);
+  }
+
+  // Bind top navigation & HUD controls
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      if (activeTab !== 'map') activeMission = null;
+      syncTabs();
+      renderView();
+    });
+  });
+
+  document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+    state.soundOn = !state.soundOn;
+    saveState();
+    updateHud();
+    if (state.soundOn) playTone('ok');
+  });
+
+  document.getElementById('mistakes-shortcut-btn').addEventListener('click', buildMistakesMission);
+
+  document.getElementById('goto-badges-btn').addEventListener('click', () => {
+    activeTab = 'study';
+    activeMission = null;
+    syncTabs();
+    renderView();
+  });
+
+  const resetModal = document.getElementById('reset-modal');
+  document.getElementById('open-reset-btn').addEventListener('click', () => resetModal.classList.remove('hidden'));
+  document.getElementById('cancel-reset-btn').addEventListener('click', () => resetModal.classList.add('hidden'));
+  document.getElementById('confirm-reset-btn').addEventListener('click', () => {
+    state = defaultState();
+    saveState();
+    activeMission = null;
+    labState.queue = [];
+    matchState.leftItems = [];
+    blitzState.phase = 'intro';
+    resetModal.classList.add('hidden');
+    updateHud();
+    renderView();
+    showToast('Η πρόοδος μηδενίστηκε.', 'warning');
+  });
+
+  // Keyboard shortcuts for Blitz mode
+  document.addEventListener('keydown', (e) => {
+    if (activeTab !== 'blitz' || blitzState.phase !== 'playing') return;
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+    const container = document.getElementById('app-view');
+    if (!blitzState.answered && typeof container._blitzEval === 'function') {
+      if (e.key === '1') container._blitzEval(true, false);
+      else if (e.key === '2') container._blitzEval(false, false);
+    } else if (blitzState.answered && e.key === 'Enter') {
+      const nextBtn = document.getElementById('blitz-next-btn');
+      if (nextBtn) nextBtn.click();
+    }
+  });
+
+
+  // Theme switcher for standalone web browsers
+  const THEME_KEY = "b1_1_theme_pref";
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    const btn = document.getElementById("theme-toggle-btn");
+    if (btn) btn.textContent = t === "dark" ? "☀️ Φωτεινό" : "🌙 Σκοτεινό";
+  }
+  const savedTheme = localStorage.getItem(THEME_KEY) ||
+    (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(savedTheme);
+  const themeBtn = document.getElementById("theme-toggle-btn");
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+  }
+
+  // Initial render
+  updateHud();
+  syncTabs();
+  renderView();
+})();
+</script>
+</body>
+</html>
